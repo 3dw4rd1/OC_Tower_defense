@@ -1,0 +1,12 @@
+# Godot
+.godot/
+*.uid
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
