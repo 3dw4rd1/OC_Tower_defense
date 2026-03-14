@@ -50,6 +50,7 @@ func start_next_wave() -> void:
 
 
 func end_wave() -> void:
+	EconomyManager.award_wave_bonus(current_wave)
 	if current_wave >= TOTAL_WAVES:
 		_set_state(GameState.VICTORY)
 		victory.emit()

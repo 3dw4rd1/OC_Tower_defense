@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://btowersplash001"]
+
+[ext_resource type="Script" path="res://scripts/towers/tower_splash.gd" id="1_splash"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 64.0
+
+[node name="TowerSplash" type="Node2D"]
+script = ExtResource("1_splash")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+color = Color(0.9, 0.5, 0.1, 1.0)
+
+[node name="RangeArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RangeArea"]
+shape = SubResource("CircleShape2D_1")

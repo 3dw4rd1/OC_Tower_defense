@@ -1,5 +1,7 @@
 extends Node
 
+signal obstacle_changed
+
 const GRID_SIZE: int = 32
 const TILE_SIZE: int = 16
 
@@ -29,6 +31,7 @@ func _build_grid() -> void:
 
 func place_obstacle(tile_pos: Vector2i) -> void:
 	_astar.set_point_disabled(_tile_to_id(tile_pos), true)
+	obstacle_changed.emit()
 
 
 func remove_obstacle(tile_pos: Vector2i) -> void:
@@ -42,7 +45,7 @@ func has_valid_path(from: Vector2i, to: Vector2i) -> bool:
 	return path.size() > 0
 
 
-func get_path(from: Vector2i, to: Vector2i) -> Array[Vector2]:
+func get_astar_path(from: Vector2i, to: Vector2i) -> Array[Vector2]:
 	var raw: PackedVector2Array = _astar.get_point_path(
 		_tile_to_id(from), _tile_to_id(to)
 	)

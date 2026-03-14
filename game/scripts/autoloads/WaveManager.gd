@@ -3,8 +3,8 @@ extends Node
 signal wave_started(wave_num: int)
 signal wave_completed(wave_num: int)
 signal all_waves_complete
+signal enemy_count_changed(count: int)
 
-const TOTAL_WAVES: int = 10
 const SPAWN_DELAY: float = 0.5
 
 const WAVE_DATA: Array = [
@@ -40,8 +40,12 @@ func set_enemies_parent(parent: Node) -> void:
 	_enemies_parent = parent
 
 
+func get_alive_count() -> int:
+	return _alive_count
+
+
 func start_wave(wave_num: int) -> void:
-	if wave_num < 1 or wave_num > TOTAL_WAVES:
+	if wave_num < 1 or wave_num > GameManager.TOTAL_WAVES:
 		return
 	var data: Dictionary = WAVE_DATA[wave_num - 1]
 	_spawn_queue.clear()
@@ -85,12 +89,14 @@ func _do_spawn(enemy_type: String) -> void:
 	enemy.position = _get_random_edge_position()
 	_enemies_parent.add_child(enemy)
 	_alive_count += 1
+	enemy_count_changed.emit(_alive_count)
 	if enemy.has_signal("died"):
 		enemy.died.connect(_on_enemy_died)
 
 
 func _on_enemy_died() -> void:
 	_alive_count -= 1
+	enemy_count_changed.emit(_alive_count)
 	_check_wave_complete()
 
 
@@ -101,7 +107,7 @@ func _check_wave_complete() -> void:
 		_wave_done = true
 		var wave_num: int = GameManager.current_wave
 		wave_completed.emit(wave_num)
-		if wave_num >= TOTAL_WAVES:
+		if wave_num >= GameManager.TOTAL_WAVES:
 			all_waves_complete.emit()
 		GameManager.end_wave()
 
