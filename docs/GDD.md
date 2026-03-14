@@ -11,7 +11,7 @@ _Status: v1.1 — Decisions locked | Owner: Sage | Last updated: 2026-03-14_
 **Engine:** Godot 4.x  
 **Platform:** PC (Windows/Linux/Mac)  
 **Scope:** Solo prototype — test case for OpenClaw agent-assisted game development  
-**Art style:** 16x16 pixel art tiles  
+**Art style:** 16x16 pixel art — dark fantasy post-apocalyptic  
 
 ### Pitch
 A strategic tower defense with no predefined lanes. Your towers are your maze. Enemies pathfind intelligently to your base — where you place your towers determines the path they take. Between waves, a skill tree lets you deeply upgrade each tower type, making progression feel powerful and personalised. Play actively or let it run while you're busy: the game is designed for both.
@@ -261,7 +261,31 @@ Win or Game Over screen
 
 ---
 
-## 10. Technical Notes (for Rex)
+## 10. Art Direction
+
+**Theme:** Dark fantasy post-apocalyptic — primitive humans defending against AI robots. Ironic tone.
+
+**World:** Cracked asphalt, rubble, ash — civilisation in ruins.
+**Humans (towers):** Scrappy, salvaged, jury-rigged. Crude but effective.
+**Robots (enemies):** Angular, cold, industrial. Rusted but relentless.
+
+**Palette:** Muted greys/browns (world) · warm orange/red (human fire) · cold blue-white (robot tech/EMP)
+
+| Element | Description |
+|---------|-------------|
+| Ground | Cracked asphalt / rubble / ash |
+| Base | Survivor camp — bonfire, scrap metal walls |
+| Enemy: Basic | Scout bot — small sensor array |
+| Enemy: Fast | Drone — lightweight, erratic |
+| Enemy: Tank | Heavy mech — armoured, slow |
+| Tower: Basic | Scrap catapult / pipe gun |
+| Tower: Sniper | Salvaged rifle on watchtower |
+| Tower: Splash | Molotov / fuel bomb launcher |
+| Tower: Slow | EMP emitter |
+
+---
+
+## 11. Technical Notes (for Rex)
 
 - **Pathfinding:** Godot's `NavigationRegion2D` or custom A* via `AStar2D`
   - Recommend `AStar2D` for tile-grid maps — gives direct control over blocked tiles
