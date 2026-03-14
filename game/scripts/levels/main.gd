@@ -1,10 +1,13 @@
 extends Node2D
 
 @onready var _enemies_container: Node2D = $EnemiesContainer
+@onready var _towers_container: Node2D = $TowersContainer
+@onready var _game_map: TileMap = $GameMap
 
 
 func _ready() -> void:
 	WaveManager.set_enemies_parent(_enemies_container)
+	_game_map.set_towers_container(_towers_container)
 
 
 func _unhandled_input(event: InputEvent) -> void:

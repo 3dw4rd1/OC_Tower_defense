@@ -1,5 +1,7 @@
 extends Node
 
+signal obstacle_changed
+
 const GRID_SIZE: int = 32
 const TILE_SIZE: int = 16
 
@@ -29,6 +31,7 @@ func _build_grid() -> void:
 
 func place_obstacle(tile_pos: Vector2i) -> void:
 	_astar.set_point_disabled(_tile_to_id(tile_pos), true)
+	obstacle_changed.emit()
 
 
 func remove_obstacle(tile_pos: Vector2i) -> void:

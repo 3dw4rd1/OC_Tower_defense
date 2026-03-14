@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://benemyfast001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_fast.gd" id="1_fast"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(14, 14)
+
+[node name="EnemyFast" type="CharacterBody2D"]
+script = ExtResource("1_fast")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+color = Color(0.9, 0.7, 0.1, 1.0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
