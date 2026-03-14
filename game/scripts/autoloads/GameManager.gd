@@ -46,6 +46,7 @@ func damage_base(amount: int) -> void:
 func start_next_wave() -> void:
 	current_wave += 1
 	_set_state(GameState.WAVE_ACTIVE)
+	WaveManager.start_wave(current_wave)
 
 
 func end_wave() -> void:

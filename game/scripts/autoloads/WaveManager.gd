@@ -32,6 +32,7 @@ var _total_spawned: int = 0
 var _spawn_queue: Array[String] = []
 var _spawn_timer: float = 0.0
 var _is_spawning: bool = false
+var _wave_done: bool = false
 var _enemies_parent: Node = null
 
 
@@ -53,6 +54,7 @@ func start_wave(wave_num: int) -> void:
 	_alive_count = 0
 	_spawn_timer = 0.0
 	_is_spawning = true
+	_wave_done = false
 	wave_started.emit(wave_num)
 
 
@@ -93,11 +95,15 @@ func _on_enemy_died() -> void:
 
 
 func _check_wave_complete() -> void:
+	if _wave_done:
+		return
 	if _total_spawned >= _total_to_spawn and _alive_count <= 0:
+		_wave_done = true
 		var wave_num: int = GameManager.current_wave
 		wave_completed.emit(wave_num)
 		if wave_num >= TOTAL_WAVES:
 			all_waves_complete.emit()
+		GameManager.end_wave()
 
 
 func _get_random_edge_position() -> Vector2:
