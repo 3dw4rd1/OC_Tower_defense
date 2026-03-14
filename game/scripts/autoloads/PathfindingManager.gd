@@ -45,7 +45,7 @@ func has_valid_path(from: Vector2i, to: Vector2i) -> bool:
 	return path.size() > 0
 
 
-func get_path(from: Vector2i, to: Vector2i) -> Array[Vector2]:
+func get_astar_path(from: Vector2i, to: Vector2i) -> Array[Vector2]:
 	var raw: PackedVector2Array = _astar.get_point_path(
 		_tile_to_id(from), _tile_to_id(to)
 	)

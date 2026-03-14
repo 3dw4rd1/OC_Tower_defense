@@ -66,5 +66,5 @@ func _recalculate_path() -> void:
 	if not is_inside_tree():
 		return
 	var my_tile: Vector2i = PathfindingManager.world_to_tile(global_position)
-	_path = PathfindingManager.get_path(my_tile, BASE_TILE)
+	_path = PathfindingManager.get_astar_path(my_tile, BASE_TILE)
 	_path_index = 0
