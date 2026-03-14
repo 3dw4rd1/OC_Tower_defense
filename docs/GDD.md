@@ -1,6 +1,6 @@
 # Game Design Document — OC Tower Defense
 
-_Status: v1.0 Draft | Owner: Sage | Last updated: 2026-03-14_
+_Status: v1.1 — Decisions locked | Owner: Sage | Last updated: 2026-03-14_
 
 ---
 
@@ -285,12 +285,14 @@ Win or Game Over screen
 
 ---
 
-## 12. Open Questions
+## 12. Decisions Log
 
-- [ ] Map size — 32x32 tiles confirmed?
-- [ ] Should base be centred or in a corner? (Centre = 4-directional pressure; corner = easier to defend)
-- [ ] Node 5 (final skill)? Or keep trees at 4 nodes for prototype?
-- [ ] Starting gold amount?
+| # | Decision | Notes |
+|---|----------|-------|
+| 1 | Map size: **32x32 tiles** | Open to iteration — Edward wants to feel it in-engine before locking |
+| 2 | Base position: **Centre** | 4-directional enemy pressure; harder, more interesting |
+| 3 | Skill tree depth: **4 nodes per tree** for prototype | Branching at node 2, two paths of 2 nodes each. Expandable later |
+| 4 | Starting gold: **100g** | Clean round number; enough for 2 Basic towers before wave 1 |
 
 ---
 
