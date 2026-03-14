@@ -16,6 +16,13 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 
+[autoload]
+
+GameManager="*res://scripts/autoloads/GameManager.gd"
+WaveManager="*res://scripts/autoloads/WaveManager.gd"
+EconomyManager="*res://scripts/autoloads/EconomyManager.gd"
+PathfindingManager="*res://scripts/autoloads/PathfindingManager.gd"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

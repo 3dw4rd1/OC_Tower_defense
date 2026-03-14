@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://bmain001"]
+
+[ext_resource type="Script" path="res://scripts/levels/main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://bgamemap001" path="res://scenes/levels/GameMap.tscn" id="2_gamemap"]
+[ext_resource type="PackedScene" uid="uid://bbase001" path="res://scenes/levels/Base.tscn" id="3_base"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="GameMap" parent="." instance=ExtResource("2_gamemap")]
+
+[node name="Base" parent="." instance=ExtResource("3_base")]
+position = Vector2(264, 264)
+
+[node name="EnemiesContainer" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(256, 256)
