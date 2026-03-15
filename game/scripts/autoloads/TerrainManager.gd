@@ -9,7 +9,7 @@ const EDGE_BUFFER: int = 2
 # Noise parameters — adjust OBSTACLE_THRESHOLD to tune coverage (~10% of full grid)
 const NOISE_SEED: int = 12345
 const NOISE_FREQUENCY: float = 0.10
-const OBSTACLE_THRESHOLD: float = 0.60  # Perlin values above this become obstacle tiles
+const OBSTACLE_THRESHOLD: float = 0.25  # Perlin values above this become obstacle tiles
 
 var obstacle_tiles: Dictionary = {}
 var _game_map: Node = null
@@ -17,13 +17,10 @@ var _obstacles_container: Node2D = null
 
 
 func initialise(game_map: Node, obstacles_container: Node2D) -> void:
-	print("TerrainManager.initialise() called, game_map: ", game_map)
 	_game_map = game_map
 	_obstacles_container = obstacles_container
 	_generate_obstacles()
-	print("Obstacles generated: ", obstacle_tiles.size())
 	_validate_paths()
-	print("Obstacles after path validation: ", obstacle_tiles.size())
 	_paint_obstacles()
 
 
@@ -46,6 +43,15 @@ func _generate_obstacles() -> void:
 	noise.seed = NOISE_SEED
 	noise.noise_type = FastNoiseLite.TYPE_PERLIN
 	noise.frequency = NOISE_FREQUENCY
+
+	var min_val: float = 1.0
+	var max_val: float = -1.0
+	for y in range(EDGE_BUFFER, GRID_ROWS - EDGE_BUFFER):
+		for x in range(EDGE_BUFFER, GRID_COLS - EDGE_BUFFER):
+			var v = noise.get_noise_2d(float(x), float(y))
+			if v < min_val: min_val = v
+			if v > max_val: max_val = v
+	print('Noise range: min=', min_val, ' max=', max_val)
 
 	for y: int in range(EDGE_BUFFER, GRID_ROWS - EDGE_BUFFER):
 		for x: int in range(EDGE_BUFFER, GRID_COLS - EDGE_BUFFER):
@@ -122,7 +128,6 @@ func _bresenham_line(from: Vector2i, to: Vector2i) -> Array[Vector2i]:
 
 
 func _paint_obstacles() -> void:
-	print('_paint_obstacles() called with ', obstacle_tiles.size(), ' tiles')
 	for cell in obstacle_tiles.keys():
 		_spawn_obstacle(cell)
 
@@ -148,4 +153,3 @@ func _spawn_obstacle(cell: Vector2i) -> void:
 	body.add_child(collision)
 
 	_obstacles_container.add_child(body)
-	print('Spawned obstacle at cell ', cell, ' world ', world_pos)
