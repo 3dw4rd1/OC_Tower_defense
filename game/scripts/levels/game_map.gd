@@ -4,9 +4,9 @@ const GRID_COLS: int = 71
 const GRID_ROWS: int = 33
 # Dark earthy brown — placeholder ground tile
 const GROUND_COLOR: Color = Color(0.22, 0.17, 0.12, 1.0)
-# Dark rocky rubble — placeholder terrain tile
-# TODO: replace with terrain art
-const TERRAIN_COLOR: Color = Color(0.55, 0.50, 0.45, 1.0)
+# Light grey — placeholder obstacle tile (rocks/impassable rubble)
+# TODO: replace with obstacle art
+const OBSTACLE_COLOR: Color = Color(0.7, 0.7, 0.7, 1.0)
 
 const TOWER_SCENES: Dictionary = {
 	"basic":  "res://scenes/towers/TowerBasic.tscn",
@@ -27,7 +27,7 @@ const BASE_TILE: Vector2i = Vector2i(35, 16)
 var selected_tower_type: String = ""
 var _placed_tiles: Dictionary = {}
 var _towers_container: Node2D = null
-var _terrain_source_id: int = -1
+var _obstacle_source_id: int = -1
 
 
 func _ready() -> void:
@@ -59,8 +59,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if tile_pos == BASE_TILE:
 		return
 
-	# Reject placement on impassable terrain
-	if TerrainManager.is_terrain(tile_pos):
+	# Reject placement on impassable obstacle tile
+	if TerrainManager.is_obstacle(tile_pos):
 		return
 
 	# Check if tile is already occupied
@@ -111,26 +111,26 @@ func _build_tileset() -> void:
 	source.texture_region_size = Vector2i(18, 18)
 	source.create_tile(Vector2i(0, 0))
 
-	# Terrain / rubble tile — darker rocky colour
-	# TODO: replace with terrain art
-	var terrain_img: Image = Image.create(18, 18, false, Image.FORMAT_RGBA8)
-	terrain_img.fill(TERRAIN_COLOR)
-	var terrain_tex: ImageTexture = ImageTexture.create_from_image(terrain_img)
+	# Obstacle / rubble tile — light grey placeholder
+	# TODO: replace with obstacle art
+	var obstacle_img: Image = Image.create(18, 18, false, Image.FORMAT_RGBA8)
+	obstacle_img.fill(OBSTACLE_COLOR)
+	var obstacle_tex: ImageTexture = ImageTexture.create_from_image(obstacle_img)
 
-	var terrain_source: TileSetAtlasSource = TileSetAtlasSource.new()
-	terrain_source.texture = terrain_tex
-	terrain_source.texture_region_size = Vector2i(18, 18)
-	terrain_source.create_tile(Vector2i(0, 0))
+	var obstacle_source: TileSetAtlasSource = TileSetAtlasSource.new()
+	obstacle_source.texture = obstacle_tex
+	obstacle_source.texture_region_size = Vector2i(18, 18)
+	obstacle_source.create_tile(Vector2i(0, 0))
 
 	var tileset: TileSet = TileSet.new()
 	tileset.tile_size = Vector2i(18, 18)
-	tileset.add_source(source)                            # source_id 0 — ground
-	_terrain_source_id = tileset.add_source(terrain_source)  # source_id 1 — terrain
+	tileset.add_source(source)                              # source_id 0 — ground
+	_obstacle_source_id = tileset.add_source(obstacle_source)  # source_id 1 — obstacle
 	tile_set = tileset
 
 
-func paint_terrain_tile(cell: Vector2i) -> void:
-	set_cell(0, cell, _terrain_source_id, Vector2i(0, 0))
+func paint_obstacle_tile(cell: Vector2i) -> void:
+	set_cell(0, cell, _obstacle_source_id, Vector2i(0, 0))
 
 
 func _fill_ground() -> void:

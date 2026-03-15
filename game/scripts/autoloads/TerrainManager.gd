@@ -6,31 +6,31 @@ const BASE_TILE: Vector2i = Vector2i(35, 16)
 # Keep this many tiles clear from every edge so spawn points are never blocked
 const EDGE_BUFFER: int = 2
 
-# Noise parameters — adjust TERRAIN_THRESHOLD to tune coverage (~10% of full grid)
+# Noise parameters — adjust OBSTACLE_THRESHOLD to tune coverage (~10% of full grid)
 const NOISE_SEED: int = 12345
 const NOISE_FREQUENCY: float = 0.10
-const TERRAIN_THRESHOLD: float = 0.60  # Perlin values above this become terrain
+const OBSTACLE_THRESHOLD: float = 0.60  # Perlin values above this become obstacle tiles
 
-var terrain_tiles: Dictionary = {}
+var obstacle_tiles: Dictionary = {}
 var _game_map: Node = null
 
 
 func initialise(game_map: Node) -> void:
 	_game_map = game_map
-	_generate_terrain()
+	_generate_obstacles()
 	_validate_paths()
-	_paint_terrain()
+	_paint_obstacles()
 
 
-func is_terrain(cell: Vector2i) -> bool:
-	return terrain_tiles.has(cell)
+func is_obstacle(cell: Vector2i) -> bool:
+	return obstacle_tiles.has(cell)
 
 
-# Removes a terrain tile at runtime — stub ready for future mechanics (e.g. bulldozing)
-func clear_terrain_tile(cell: Vector2i) -> void:
-	if not terrain_tiles.has(cell):
+# Removes an obstacle tile at runtime — stub ready for future mechanics (e.g. bulldozing)
+func clear_obstacle_tile(cell: Vector2i) -> void:
+	if not obstacle_tiles.has(cell):
 		return
-	terrain_tiles.erase(cell)
+	obstacle_tiles.erase(cell)
 	PathfindingManager.remove_obstacle(cell)
 	if _game_map:
 		# Restore ground tile
@@ -39,7 +39,7 @@ func clear_terrain_tile(cell: Vector2i) -> void:
 
 # ─── Private ──────────────────────────────────────────────────────────────────
 
-func _generate_terrain() -> void:
+func _generate_obstacles() -> void:
 	var noise := FastNoiseLite.new()
 	noise.seed = NOISE_SEED
 	noise.noise_type = FastNoiseLite.TYPE_PERLIN
@@ -51,8 +51,8 @@ func _generate_terrain() -> void:
 			if cell == BASE_TILE:
 				continue
 			var value: float = noise.get_noise_2d(float(x), float(y))
-			if value > TERRAIN_THRESHOLD:
-				terrain_tiles[cell] = true
+			if value > OBSTACLE_THRESHOLD:
+				obstacle_tiles[cell] = true
 				PathfindingManager.place_obstacle(cell)
 
 
@@ -84,11 +84,11 @@ func _validate_paths() -> void:
 			_carve_corridor(sample, BASE_TILE)
 
 
-# Removes terrain tiles along the direct Bresenham line to restore connectivity
+# Removes obstacle tiles along the direct Bresenham line to restore connectivity
 func _carve_corridor(from: Vector2i, to: Vector2i) -> void:
 	for cell: Vector2i in _bresenham_line(from, to):
-		if terrain_tiles.has(cell):
-			terrain_tiles.erase(cell)
+		if obstacle_tiles.has(cell):
+			obstacle_tiles.erase(cell)
 			PathfindingManager.remove_obstacle(cell)
 
 
@@ -119,8 +119,8 @@ func _bresenham_line(from: Vector2i, to: Vector2i) -> Array[Vector2i]:
 	return cells
 
 
-func _paint_terrain() -> void:
+func _paint_obstacles() -> void:
 	if _game_map == null:
 		return
-	for cell: Variant in terrain_tiles.keys():
-		_game_map.paint_terrain_tile(cell as Vector2i)
+	for cell: Variant in obstacle_tiles.keys():
+		_game_map.paint_obstacle_tile(cell as Vector2i)
