@@ -1,6 +1,7 @@
 extends TileMap
 
-const GRID_SIZE: int = 32
+const GRID_COLS: int = 71
+const GRID_ROWS: int = 33
 # Dark earthy brown — placeholder ground tile
 const GROUND_COLOR: Color = Color(0.22, 0.17, 0.12, 1.0)
 
@@ -18,7 +19,7 @@ const TOWER_COSTS: Dictionary = {
 	"slow":   80,
 }
 
-const BASE_TILE: Vector2i = Vector2i(16, 16)
+const BASE_TILE: Vector2i = Vector2i(35, 16)
 
 var selected_tower_type: String = ""
 var _placed_tiles: Dictionary = {}
@@ -47,7 +48,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	var tile_pos: Vector2i = PathfindingManager.world_to_tile(world_pos)
 
 	# Validate tile is within grid
-	if tile_pos.x < 0 or tile_pos.x >= GRID_SIZE or tile_pos.y < 0 or tile_pos.y >= GRID_SIZE:
+	if tile_pos.x < 0 or tile_pos.x >= GRID_COLS or tile_pos.y < 0 or tile_pos.y >= GRID_ROWS:
 		return
 
 	# Reject placement on base tile
@@ -93,22 +94,22 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _build_tileset() -> void:
-	var img: Image = Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	var img: Image = Image.create(18, 18, false, Image.FORMAT_RGBA8)
 	img.fill(GROUND_COLOR)
 	var tex: ImageTexture = ImageTexture.create_from_image(img)
 
 	var source: TileSetAtlasSource = TileSetAtlasSource.new()
 	source.texture = tex
-	source.texture_region_size = Vector2i(16, 16)
+	source.texture_region_size = Vector2i(18, 18)
 	source.create_tile(Vector2i(0, 0))
 
 	var tileset: TileSet = TileSet.new()
-	tileset.tile_size = Vector2i(16, 16)
+	tileset.tile_size = Vector2i(18, 18)
 	tileset.add_source(source)
 	tile_set = tileset
 
 
 func _fill_ground() -> void:
-	for y: int in range(GRID_SIZE):
-		for x: int in range(GRID_SIZE):
+	for y: int in range(GRID_ROWS):
+		for x: int in range(GRID_COLS):
 			set_cell(0, Vector2i(x, y), 0, Vector2i(0, 0))

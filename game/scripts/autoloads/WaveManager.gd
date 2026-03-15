@@ -116,9 +116,9 @@ func _get_random_edge_position() -> Vector2:
 	var edge: int = randi() % 4
 	var tile: Vector2i
 	match edge:
-		0: tile = Vector2i(randi() % 32, 0)
-		1: tile = Vector2i(randi() % 32, 31)
-		2: tile = Vector2i(0, randi() % 32)
-		3: tile = Vector2i(31, randi() % 32)
+		0: tile = Vector2i(randi() % PathfindingManager.GRID_COLS, 0)
+		1: tile = Vector2i(randi() % PathfindingManager.GRID_COLS, PathfindingManager.GRID_ROWS - 1)
+		2: tile = Vector2i(0, randi() % PathfindingManager.GRID_ROWS)
+		3: tile = Vector2i(PathfindingManager.GRID_COLS - 1, randi() % PathfindingManager.GRID_ROWS)
 		_: tile = Vector2i(0, 0)
 	return PathfindingManager.tile_to_world(tile)

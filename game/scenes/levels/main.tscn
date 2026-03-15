@@ -9,9 +9,10 @@
 script = ExtResource("1_main")
 
 [node name="GameMap" parent="." instance=ExtResource("2_gamemap")]
+position = Vector2(0, 50)
 
 [node name="Base" parent="." instance=ExtResource("3_base")]
-position = Vector2(264, 264)
+position = Vector2(639, 347)
 
 [node name="EnemiesContainer" type="Node2D" parent="."]
 

@@ -2,8 +2,10 @@ extends Node
 
 signal obstacle_changed
 
-const GRID_SIZE: int = 32
-const TILE_SIZE: int = 16
+const GRID_COLS: int = 71
+const GRID_ROWS: int = 33
+const TILE_SIZE: int = 18
+const BASE_TILE: Vector2i = Vector2i(35, 16)
 
 var _astar: AStar2D = AStar2D.new()
 
@@ -14,18 +16,18 @@ func _ready() -> void:
 
 func _build_grid() -> void:
 	# Add all grid points
-	for y: int in range(GRID_SIZE):
-		for x: int in range(GRID_SIZE):
+	for y: int in range(GRID_ROWS):
+		for x: int in range(GRID_COLS):
 			var id: int = _tile_to_id(Vector2i(x, y))
 			_astar.add_point(id, tile_to_world(Vector2i(x, y)))
 
 	# Connect 4-directional neighbours
-	for y: int in range(GRID_SIZE):
-		for x: int in range(GRID_SIZE):
+	for y: int in range(GRID_ROWS):
+		for x: int in range(GRID_COLS):
 			var id: int = _tile_to_id(Vector2i(x, y))
-			if x + 1 < GRID_SIZE:
+			if x + 1 < GRID_COLS:
 				_astar.connect_points(id, _tile_to_id(Vector2i(x + 1, y)))
-			if y + 1 < GRID_SIZE:
+			if y + 1 < GRID_ROWS:
 				_astar.connect_points(id, _tile_to_id(Vector2i(x, y + 1)))
 
 
@@ -58,16 +60,16 @@ func get_astar_path(from: Vector2i, to: Vector2i) -> Array[Vector2]:
 func tile_to_world(tile_pos: Vector2i) -> Vector2:
 	return Vector2(
 		tile_pos.x * TILE_SIZE + TILE_SIZE / 2,
-		tile_pos.y * TILE_SIZE + TILE_SIZE / 2
+		tile_pos.y * TILE_SIZE + TILE_SIZE / 2 + 50
 	)
 
 
 func world_to_tile(world_pos: Vector2) -> Vector2i:
 	return Vector2i(
 		int(world_pos.x / TILE_SIZE),
-		int(world_pos.y / TILE_SIZE)
+		int((world_pos.y - 50) / TILE_SIZE)
 	)
 
 
 func _tile_to_id(tile_pos: Vector2i) -> int:
-	return tile_pos.y * GRID_SIZE + tile_pos.x
+	return tile_pos.y * GRID_COLS + tile_pos.x

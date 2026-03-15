@@ -11,7 +11,7 @@ var _path_index: int = 0
 var _speed_multiplier: float = 1.0
 var _slow_timer: float = 0.0
 
-const BASE_TILE: Vector2i = Vector2i(16, 16)
+var BASE_TILE: Vector2i = PathfindingManager.BASE_TILE
 
 
 func _ready() -> void:
