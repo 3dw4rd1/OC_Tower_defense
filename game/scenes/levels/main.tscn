@@ -19,6 +19,6 @@ position = Vector2(639, 347)
 [node name="TowersContainer" type="Node2D" parent="."]
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(256, 256)
+position = Vector2(639, 347)
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
