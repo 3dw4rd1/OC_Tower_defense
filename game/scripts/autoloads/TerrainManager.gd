@@ -12,10 +12,10 @@ const NOISE_FREQUENCY: float = 0.10
 const TERRAIN_THRESHOLD: float = 0.60  # Perlin values above this become terrain
 
 var terrain_tiles: Dictionary = {}
-var _game_map: TileMap = null
+var _game_map: Node = null
 
 
-func initialise(game_map: TileMap) -> void:
+func initialise(game_map: Node) -> void:
 	_game_map = game_map
 	_generate_terrain()
 	_validate_paths()

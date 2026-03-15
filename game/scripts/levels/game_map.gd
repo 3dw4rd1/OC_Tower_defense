@@ -6,7 +6,7 @@ const GRID_ROWS: int = 33
 const GROUND_COLOR: Color = Color(0.22, 0.17, 0.12, 1.0)
 # Dark rocky rubble — placeholder terrain tile
 # TODO: replace with terrain art
-const TERRAIN_COLOR: Color = Color(0.28, 0.24, 0.20, 1.0)
+const TERRAIN_COLOR: Color = Color(0.55, 0.50, 0.45, 1.0)
 
 const TOWER_SCENES: Dictionary = {
 	"basic":  "res://scenes/towers/TowerBasic.tscn",
