@@ -22,6 +22,7 @@ GameManager="*res://scripts/autoloads/GameManager.gd"
 WaveManager="*res://scripts/autoloads/WaveManager.gd"
 EconomyManager="*res://scripts/autoloads/EconomyManager.gd"
 PathfindingManager="*res://scripts/autoloads/PathfindingManager.gd"
+TerrainManager="*res://scripts/autoloads/TerrainManager.gd"
 
 [rendering]
 

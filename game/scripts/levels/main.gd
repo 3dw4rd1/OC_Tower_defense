@@ -8,6 +8,7 @@ extends Node2D
 func _ready() -> void:
 	WaveManager.set_enemies_parent(_enemies_container)
 	_game_map.set_towers_container(_towers_container)
+	TerrainManager.initialise(_game_map)
 
 
 func _unhandled_input(event: InputEvent) -> void:
