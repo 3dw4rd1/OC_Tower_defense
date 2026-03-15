@@ -2,8 +2,8 @@ extends TileMap
 
 const GRID_COLS: int = 71
 const GRID_ROWS: int = 33
-# Dark earthy brown — placeholder ground tile
-const GROUND_COLOR: Color = Color(0.22, 0.17, 0.12, 1.0)
+# Dark green — placeholder ground tile (grass)
+const GROUND_COLOR: Color = Color(0.18, 0.38, 0.18, 1.0)
 # Light grey — placeholder obstacle tile (rocks/impassable rubble)
 # TODO: replace with obstacle art
 const OBSTACLE_COLOR: Color = Color(0.7, 0.7, 0.7, 1.0)
