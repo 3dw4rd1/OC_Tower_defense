@@ -1,8 +1,15 @@
 extends Node2D
 
+const PROJECTILE_SCENE = preload("res://scenes/towers/Projectile.tscn")
+
+@export var debug_attacks: bool = false
+
 var damage: int = 10
 var range_px: float = 96.0
 var attack_speed: float = 1.0  # attacks per second
+var projectile_color: Color = Color(0.86, 0.63, 0.24)
+var projectile_aoe_radius: float = 0.0
+var projectile_slow_duration: float = 0.0
 
 var _attack_timer: float = 0.0
 var _enemies_in_range: Array[Node2D] = []
@@ -33,8 +40,20 @@ func _do_attack() -> void:
 
 
 func _attack_target(target: Node2D) -> void:
-	if target.has_method("take_damage"):
-		target.take_damage(damage)
+	_spawn_projectile(target)
+	if debug_attacks:
+		print("[%s] Fired at %s (hp: %s) — damage: %d" % [name, target.name, target.get("_hp"), damage])
+
+
+func _spawn_projectile(target: Node2D) -> void:
+	var proj: Node2D = PROJECTILE_SCENE.instantiate()
+	proj.target = target
+	proj.damage = damage
+	proj.color = projectile_color
+	proj.aoe_radius = projectile_aoe_radius
+	proj.slow_duration = projectile_slow_duration
+	proj.global_position = global_position
+	get_parent().add_child(proj)
 
 
 func _get_nearest_enemy() -> Node2D:
