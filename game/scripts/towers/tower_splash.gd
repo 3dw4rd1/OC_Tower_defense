@@ -7,14 +7,16 @@ func _ready() -> void:
 	damage = 15
 	range_px = 64.0
 	attack_speed = 1.0
+	projectile_color = Color(0.78, 0.31, 0.08)
+	projectile_aoe_radius = SPLASH_RADIUS
 	super._ready()
 
 
 func _attack_target(target: Node2D) -> void:
-	# AoE: damage all enemies within splash radius of the target
-	for enemy: Node2D in _enemies_in_range:
-		if not is_instance_valid(enemy):
-			continue
-		if target.global_position.distance_to(enemy.global_position) <= SPLASH_RADIUS:
-			if enemy.has_method("take_damage"):
-				enemy.take_damage(damage)
+	if debug_attacks:
+		var hit_count: int = 0
+		for enemy: Node2D in _enemies_in_range:
+			if is_instance_valid(enemy) and target.global_position.distance_to(enemy.global_position) <= SPLASH_RADIUS:
+				hit_count += 1
+		print("[%s] AoE fired — hit %d enemies" % [name, hit_count])
+	_spawn_projectile(target)
