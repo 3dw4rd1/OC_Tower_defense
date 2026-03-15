@@ -128,9 +128,18 @@ func _build_tileset() -> void:
 	_obstacle_source_id = tileset.add_source(obstacle_source)  # source_id 1 — obstacle
 	tile_set = tileset
 
+	# Ensure layer 1 exists for obstacles
+	if get_layers_count() < 2:
+		add_layer(1)
+	set_layer_z_index(1, 1)
+
 
 func paint_obstacle_tile(cell: Vector2i) -> void:
-	set_cell(0, cell, _obstacle_source_id, Vector2i(0, 0))
+	set_cell(1, cell, _obstacle_source_id, Vector2i(0, 0))
+
+
+func clear_obstacle_tile(cell: Vector2i) -> void:
+	erase_cell(1, cell)
 
 
 func _fill_ground() -> void:
