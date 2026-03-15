@@ -16,9 +16,12 @@ var _game_map: Node = null
 
 
 func initialise(game_map: Node) -> void:
+	print("TerrainManager.initialise() called, game_map: ", game_map)
 	_game_map = game_map
 	_generate_obstacles()
+	print("Obstacles generated: ", obstacle_tiles.size())
 	_validate_paths()
+	print("Obstacles after path validation: ", obstacle_tiles.size())
 	_paint_obstacles()
 
 
@@ -120,7 +123,10 @@ func _bresenham_line(from: Vector2i, to: Vector2i) -> Array[Vector2i]:
 
 
 func _paint_obstacles() -> void:
+	print("_paint_obstacles() called with ", obstacle_tiles.size(), " tiles, game_map: ", _game_map)
 	if _game_map == null:
+		push_error("TerrainManager._paint_obstacles(): _game_map is null — initialise() not called correctly")
 		return
 	for cell: Variant in obstacle_tiles.keys():
 		_game_map.paint_obstacle_tile(cell as Vector2i)
+	print("_paint_obstacles() complete")
