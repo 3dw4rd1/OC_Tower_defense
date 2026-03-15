@@ -28,6 +28,7 @@ var selected_tower_type: String = ""
 var _placed_tiles: Dictionary = {}
 var _towers_container: Node2D = null
 var _obstacle_source_id: int = -1
+var _obstacle_debug_printed: bool = false
 
 
 func _ready() -> void:
@@ -102,6 +103,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _build_tileset() -> void:
+	# Ensure layer 1 exists BEFORE assigning the tileset (Godot 4 requirement)
+	if get_layers_count() < 2:
+		add_layer(1)
+
 	var img: Image = Image.create(16, 16, false, Image.FORMAT_RGBA8)
 	img.fill(GROUND_COLOR)
 	var tex: ImageTexture = ImageTexture.create_from_image(img)
@@ -128,13 +133,13 @@ func _build_tileset() -> void:
 	_obstacle_source_id = tileset.add_source(obstacle_source)  # source_id 1 — obstacle
 	tile_set = tileset
 
-	# Ensure layer 1 exists for obstacles
-	if get_layers_count() < 2:
-		add_layer(1)
 	set_layer_z_index(1, 1)
 
 
 func paint_obstacle_tile(cell: Vector2i) -> void:
+	if not _obstacle_debug_printed:
+		print("Painting obstacle at ", cell, " layer:", 1, " source:", _obstacle_source_id)
+		_obstacle_debug_printed = true
 	set_cell(1, cell, _obstacle_source_id, Vector2i(0, 0))
 
 
