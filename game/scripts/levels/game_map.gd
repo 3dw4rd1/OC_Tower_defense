@@ -4,9 +4,6 @@ const GRID_COLS: int = 71
 const GRID_ROWS: int = 33
 # Dark green — placeholder ground tile (grass)
 const GROUND_COLOR: Color = Color(0.18, 0.38, 0.18, 1.0)
-# Light grey — placeholder obstacle tile (rocks/impassable rubble)
-# TODO: replace with obstacle art
-const OBSTACLE_COLOR: Color = Color(0.7, 0.7, 0.7, 1.0)
 
 const TOWER_SCENES: Dictionary = {
 	"basic":  "res://scenes/towers/TowerBasic.tscn",
@@ -27,8 +24,6 @@ const BASE_TILE: Vector2i = Vector2i(35, 16)
 var selected_tower_type: String = ""
 var _placed_tiles: Dictionary = {}
 var _towers_container: Node2D = null
-var _obstacle_source_id: int = -1
-var _obstacle_debug_printed: bool = false
 
 
 func _ready() -> void:
@@ -103,10 +98,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _build_tileset() -> void:
-	# Ensure layer 1 exists BEFORE assigning the tileset (Godot 4 requirement)
-	if get_layers_count() < 2:
-		add_layer(1)
-
 	var img: Image = Image.create(16, 16, false, Image.FORMAT_RGBA8)
 	img.fill(GROUND_COLOR)
 	var tex: ImageTexture = ImageTexture.create_from_image(img)
@@ -116,35 +107,10 @@ func _build_tileset() -> void:
 	source.texture_region_size = Vector2i(16, 16)
 	source.create_tile(Vector2i(0, 0))
 
-	# Obstacle / rubble tile — light grey placeholder
-	# TODO: replace with obstacle art
-	var obstacle_img: Image = Image.create(16, 16, false, Image.FORMAT_RGBA8)
-	obstacle_img.fill(OBSTACLE_COLOR)
-	var obstacle_tex: ImageTexture = ImageTexture.create_from_image(obstacle_img)
-
-	var obstacle_source: TileSetAtlasSource = TileSetAtlasSource.new()
-	obstacle_source.texture = obstacle_tex
-	obstacle_source.texture_region_size = Vector2i(16, 16)
-	obstacle_source.create_tile(Vector2i(0, 0))
-
 	var tileset: TileSet = TileSet.new()
 	tileset.tile_size = Vector2i(16, 16)
-	tileset.add_source(source)                              # source_id 0 — ground
-	_obstacle_source_id = tileset.add_source(obstacle_source)  # source_id 1 — obstacle
+	tileset.add_source(source)  # source_id 0 — ground
 	tile_set = tileset
-
-	set_layer_z_index(1, 1)
-
-
-func paint_obstacle_tile(cell: Vector2i) -> void:
-	if not _obstacle_debug_printed:
-		print("Painting obstacle at ", cell, " layer:", 1, " source:", _obstacle_source_id)
-		_obstacle_debug_printed = true
-	set_cell(1, cell, _obstacle_source_id, Vector2i(0, 0))
-
-
-func clear_obstacle_tile(cell: Vector2i) -> void:
-	erase_cell(1, cell)
 
 
 func _fill_ground() -> void:

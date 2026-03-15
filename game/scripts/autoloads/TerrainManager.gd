@@ -13,11 +13,13 @@ const OBSTACLE_THRESHOLD: float = 0.60  # Perlin values above this become obstac
 
 var obstacle_tiles: Dictionary = {}
 var _game_map: Node = null
+var _obstacles_container: Node2D = null
 
 
-func initialise(game_map: Node) -> void:
+func initialise(game_map: Node, obstacles_container: Node2D) -> void:
 	print("TerrainManager.initialise() called, game_map: ", game_map)
 	_game_map = game_map
+	_obstacles_container = obstacles_container
 	_generate_obstacles()
 	print("Obstacles generated: ", obstacle_tiles.size())
 	_validate_paths()
@@ -35,9 +37,6 @@ func clear_obstacle_tile(cell: Vector2i) -> void:
 		return
 	obstacle_tiles.erase(cell)
 	PathfindingManager.remove_obstacle(cell)
-	if _game_map:
-		# Restore ground tile
-		_game_map.set_cell(0, cell, 0, Vector2i(0, 0))
 
 
 # ─── Private ──────────────────────────────────────────────────────────────────
@@ -123,10 +122,30 @@ func _bresenham_line(from: Vector2i, to: Vector2i) -> Array[Vector2i]:
 
 
 func _paint_obstacles() -> void:
-	print("_paint_obstacles() called with ", obstacle_tiles.size(), " tiles, game_map: ", _game_map)
-	if _game_map == null:
-		push_error("TerrainManager._paint_obstacles(): _game_map is null — initialise() not called correctly")
-		return
-	for cell: Variant in obstacle_tiles.keys():
-		_game_map.paint_obstacle_tile(cell as Vector2i)
-	print("_paint_obstacles() complete")
+	print('_paint_obstacles() called with ', obstacle_tiles.size(), ' tiles')
+	for cell in obstacle_tiles.keys():
+		_spawn_obstacle(cell)
+
+
+func _spawn_obstacle(cell: Vector2i) -> void:
+	var world_pos: Vector2 = PathfindingManager.tile_to_world(cell)
+
+	var body := StaticBody2D.new()
+	body.position = world_pos
+
+	# Visual — 14x14 grey square centred in the tile
+	var rect := ColorRect.new()
+	rect.color = Color(0.7, 0.7, 0.7, 1.0)
+	rect.size = Vector2(14, 14)
+	rect.position = Vector2(-7, -7)
+	body.add_child(rect)
+
+	# Collision — matches visual size
+	var collision := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = Vector2(14, 14)
+	collision.shape = shape
+	body.add_child(collision)
+
+	_obstacles_container.add_child(body)
+	print('Spawned obstacle at cell ', cell, ' world ', world_pos)
