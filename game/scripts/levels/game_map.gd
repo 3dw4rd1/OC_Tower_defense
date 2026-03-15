@@ -102,28 +102,28 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _build_tileset() -> void:
-	var img: Image = Image.create(18, 18, false, Image.FORMAT_RGBA8)
+	var img: Image = Image.create(16, 16, false, Image.FORMAT_RGBA8)
 	img.fill(GROUND_COLOR)
 	var tex: ImageTexture = ImageTexture.create_from_image(img)
 
 	var source: TileSetAtlasSource = TileSetAtlasSource.new()
 	source.texture = tex
-	source.texture_region_size = Vector2i(18, 18)
+	source.texture_region_size = Vector2i(16, 16)
 	source.create_tile(Vector2i(0, 0))
 
 	# Obstacle / rubble tile — light grey placeholder
 	# TODO: replace with obstacle art
-	var obstacle_img: Image = Image.create(18, 18, false, Image.FORMAT_RGBA8)
+	var obstacle_img: Image = Image.create(16, 16, false, Image.FORMAT_RGBA8)
 	obstacle_img.fill(OBSTACLE_COLOR)
 	var obstacle_tex: ImageTexture = ImageTexture.create_from_image(obstacle_img)
 
 	var obstacle_source: TileSetAtlasSource = TileSetAtlasSource.new()
 	obstacle_source.texture = obstacle_tex
-	obstacle_source.texture_region_size = Vector2i(18, 18)
+	obstacle_source.texture_region_size = Vector2i(16, 16)
 	obstacle_source.create_tile(Vector2i(0, 0))
 
 	var tileset: TileSet = TileSet.new()
-	tileset.tile_size = Vector2i(18, 18)
+	tileset.tile_size = Vector2i(16, 16)
 	tileset.add_source(source)                              # source_id 0 — ground
 	_obstacle_source_id = tileset.add_source(obstacle_source)  # source_id 1 — obstacle
 	tile_set = tileset
