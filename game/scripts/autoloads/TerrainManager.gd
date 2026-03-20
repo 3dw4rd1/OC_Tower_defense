@@ -7,9 +7,10 @@ const BASE_TILE: Vector2i = Vector2i(35, 16)
 const EDGE_BUFFER: int = 2
 
 # Noise parameters — adjust OBSTACLE_THRESHOLD to tune coverage (~10% of full grid)
-const NOISE_SEED: int = 12345
 const NOISE_FREQUENCY: float = 0.10
 const OBSTACLE_THRESHOLD: float = 0.25  # Perlin values above this become obstacle tiles
+# Tiles within this Chebyshev radius of the base are always kept clear
+const BASE_CLEAR_RADIUS: int = 3
 
 var obstacle_tiles: Dictionary = {}
 var _game_map: Node = null
@@ -40,23 +41,15 @@ func clear_obstacle_tile(cell: Vector2i) -> void:
 
 func _generate_obstacles() -> void:
 	var noise := FastNoiseLite.new()
-	noise.seed = NOISE_SEED
+	noise.seed = randi()
 	noise.noise_type = FastNoiseLite.TYPE_PERLIN
 	noise.frequency = NOISE_FREQUENCY
-
-	var min_val: float = 1.0
-	var max_val: float = -1.0
-	for y in range(EDGE_BUFFER, GRID_ROWS - EDGE_BUFFER):
-		for x in range(EDGE_BUFFER, GRID_COLS - EDGE_BUFFER):
-			var v = noise.get_noise_2d(float(x), float(y))
-			if v < min_val: min_val = v
-			if v > max_val: max_val = v
-	print('Noise range: min=', min_val, ' max=', max_val)
 
 	for y: int in range(EDGE_BUFFER, GRID_ROWS - EDGE_BUFFER):
 		for x: int in range(EDGE_BUFFER, GRID_COLS - EDGE_BUFFER):
 			var cell := Vector2i(x, y)
-			if cell == BASE_TILE:
+			# Keep a clear zone around the base
+			if absi(x - BASE_TILE.x) <= BASE_CLEAR_RADIUS and absi(y - BASE_TILE.y) <= BASE_CLEAR_RADIUS:
 				continue
 			var value: float = noise.get_noise_2d(float(x), float(y))
 			if value > OBSTACLE_THRESHOLD:
