@@ -4,7 +4,7 @@ signal obstacle_changed
 
 const GRID_COLS: int = 71
 const GRID_ROWS: int = 33
-const TILE_SIZE: int = 18
+const TILE_SIZE: int = 16
 const BASE_TILE: Vector2i = Vector2i(35, 16)
 
 var _astar: AStar2D = AStar2D.new()

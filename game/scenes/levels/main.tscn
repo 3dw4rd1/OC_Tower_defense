@@ -12,7 +12,7 @@ script = ExtResource("1_main")
 position = Vector2(1, 50)
 
 [node name="Base" parent="." instance=ExtResource("3_base")]
-position = Vector2(639, 347)
+position = Vector2(568, 314)
 
 [node name="EnemiesContainer" type="Node2D" parent="."]
 
