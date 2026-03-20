@@ -10,7 +10,7 @@ const EDGE_BUFFER: int = 2
 const NOISE_FREQUENCY: float = 0.10
 const OBSTACLE_THRESHOLD: float = 0.25  # Perlin values above this become obstacle tiles
 # Tiles within this Chebyshev radius of the base are always kept clear
-const BASE_CLEAR_RADIUS: int = 3
+const BASE_CLEAR_RADIUS: int = 5
 
 var obstacle_tiles: Dictionary = {}
 var _game_map: Node = null
