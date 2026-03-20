@@ -98,17 +98,17 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _build_tileset() -> void:
-	var img: Image = Image.create(18, 18, false, Image.FORMAT_RGBA8)
+	var img: Image = Image.create(16, 16, false, Image.FORMAT_RGBA8)
 	img.fill(GROUND_COLOR)
 	var tex: ImageTexture = ImageTexture.create_from_image(img)
 
 	var source: TileSetAtlasSource = TileSetAtlasSource.new()
 	source.texture = tex
-	source.texture_region_size = Vector2i(18, 18)
+	source.texture_region_size = Vector2i(16, 16)
 	source.create_tile(Vector2i(0, 0))
 
 	var tileset: TileSet = TileSet.new()
-	tileset.tile_size = Vector2i(18, 18)
+	tileset.tile_size = Vector2i(16, 16)
 	tileset.add_source(source)  # source_id 0 — ground
 	tile_set = tileset
 
