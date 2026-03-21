@@ -5,40 +5,15 @@ signal wave_completed(wave_num: int)
 signal all_waves_complete
 signal enemy_count_changed(count: int)
 
-# Plan A: spawn interval linearly interpolated from 1.2s (wave 1) to 0.45s (wave 10)
-const SPAWN_INTERVAL_W1: float = 1.2
-const SPAWN_INTERVAL_W10: float = 0.45
+# ── Plan A: waves 1–10 (The Swarm) ────────────────────────────────────────────
+const PLAN_A_COUNTS: Array[int]       = [8, 12, 18, 25, 35, 48, 64, 85, 110, 150]
+const PLAN_A_HP: Array[int]           = [60, 70, 85, 100, 120, 145, 175, 210, 255, 300]
+const PLAN_A_SPEED_MULT: Array[float] = [1.0, 1.0, 1.05, 1.1, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4]
+const PLAN_A_BASE_SPEED: float        = 80.0  # enemy_basic default speed
+const BURST_INNER_DELAY: float        = 0.1   # gap between enemies inside a burst cluster
 
-# Plan A: base HP per wave (indices 0-9 = waves 1-10)
-const WAVE_HP: Array[int] = [60, 70, 85, 100, 120, 145, 175, 210, 255, 300]
-
-# Plan A: speed multiplier per wave (indices 0-9 = waves 1-10)
-const WAVE_SPEED_MULT: Array[float] = [1.0, 1.0, 1.05, 1.1, 1.1, 1.15, 1.2, 1.25, 1.3, 1.4]
-
-# Plan A wave compositions (waves 1-10) + continuation (waves 11-25)
-# Scouts are ~20-25% of total from wave 5 onward; reuse EnemyBasic scene with modified stats
-const WAVE_DATA: Array = [
-	# Wave 1: 8 total
-	{"basic": 8},
-	# Wave 2: 12 total
-	{"basic": 12},
-	# Wave 3: 18 total
-	{"basic": 18},
-	# Wave 4: 25 total
-	{"basic": 25},
-	# Wave 5: 35 total — 9 scouts (~26%), 26 basic
-	{"basic": 26, "scout": 9},
-	# Wave 6: 48 total — 10 scouts (~21%), 38 basic
-	{"basic": 38, "scout": 10},
-	# Wave 7: 64 total — 14 scouts (~22%), 50 basic
-	{"basic": 50, "scout": 14},
-	# Wave 8: 85 total — 17 scouts (~20%), 68 basic  [burst mode starts]
-	{"basic": 68, "scout": 17},
-	# Wave 9: 110 total — 24 scouts (~22%), 86 basic
-	{"basic": 86, "scout": 24},
-	# Wave 10: 150 total — 38 scouts (~25%), 112 basic
-	{"basic": 112, "scout": 38},
-	# Waves 11-25: continuation with post-plan-A exponential scaling
+# ── Legacy wave data: waves 11–25 ─────────────────────────────────────────────
+const LEGACY_WAVE_DATA: Array = [
 	{"basic": 15, "fast": 8},
 	{"fast": 10, "tank": 5},
 	{"basic": 12, "fast": 8, "tank": 4},
@@ -58,25 +33,23 @@ const WAVE_DATA: Array = [
 
 const ENEMY_SCENES: Dictionary = {
 	"basic": "res://scenes/enemies/EnemyBasic.tscn",
+	"scout": "res://scenes/enemies/EnemyBasic.tscn",  # same scene, stats overridden at spawn
 	"fast":  "res://scenes/enemies/EnemyFast.tscn",
 	"tank":  "res://scenes/enemies/EnemyTank.tscn",
-	"scout": "res://scenes/enemies/EnemyBasic.tscn",  # reuses basic scene with modified stats
 }
-
-# Burst spawning constants (wave 8+)
-const BURST_SIZE_MIN: int = 3
-const BURST_SIZE_MAX: int = 4
-const BURST_PAUSE: float = 0.9  # seconds between bursts
 
 var _alive_count: int = 0
 var _total_to_spawn: int = 0
 var _total_spawned: int = 0
 var _spawn_queue: Array[String] = []
+var _spawn_delays: Array[float] = []  # delay after each spawn before the next
 var _spawn_timer: float = 0.0
 var _is_spawning: bool = false
 var _wave_done: bool = false
 var _enemies_parent: Node = null
-var _current_spawn_interval: float = SPAWN_INTERVAL_W1
+var _plan_a_wave: bool = false
+var _current_wave_hp: int = 0
+var _current_wave_speed_mult: float = 1.0
 
 
 func set_enemies_parent(parent: Node) -> void:
@@ -90,53 +63,104 @@ func get_alive_count() -> int:
 func start_wave(wave_num: int) -> void:
 	if wave_num < 1 or wave_num > GameManager.TOTAL_WAVES:
 		return
-	var data: Dictionary = WAVE_DATA[wave_num - 1]
+
 	_spawn_queue.clear()
-	for enemy_type: String in data:
-		for _i: int in range(data[enemy_type]):
-			_spawn_queue.append(enemy_type)
-	_spawn_queue.shuffle()
-	_total_to_spawn = _spawn_queue.size()
+	_spawn_delays.clear()
 	_total_spawned = 0
 	_alive_count = 0
 	_spawn_timer = 0.0
 	_is_spawning = true
 	_wave_done = false
-	_current_spawn_interval = _get_spawn_interval(wave_num)
+
+	if wave_num <= 10:
+		_start_plan_a_wave(wave_num)
+	else:
+		_plan_a_wave = false
+		_start_legacy_wave(wave_num)
+
+	_total_to_spawn = _spawn_queue.size()
 	wave_started.emit(wave_num)
 
 
-func _get_spawn_interval(wave_num: int) -> float:
-	if wave_num <= 1:
-		return SPAWN_INTERVAL_W1
-	if wave_num >= 10:
-		return SPAWN_INTERVAL_W10
-	var t: float = float(wave_num - 1) / 9.0
-	return SPAWN_INTERVAL_W1 + t * (SPAWN_INTERVAL_W10 - SPAWN_INTERVAL_W1)
+func _start_plan_a_wave(wave_num: int) -> void:
+	_plan_a_wave = true
+	var idx: int = wave_num - 1
+	var total_count: int = PLAN_A_COUNTS[idx]
+	_current_wave_hp = PLAN_A_HP[idx]
+	_current_wave_speed_mult = PLAN_A_SPEED_MULT[idx]
+	# Spawn interval: 1.2 s at wave 1, 0.45 s at wave 10, linear interpolation
+	var spawn_interval: float = lerpf(1.2, 0.45, float(idx) / 9.0)
+	var use_scouts: bool = wave_num >= 5
+	var use_bursts: bool = wave_num >= 8
+
+	var enemy_list: Array[String] = []
+	if use_scouts:
+		# ~22.5 % scouts, rest regular
+		var scout_count: int = int(round(total_count * 0.225))
+		var regular_count: int = total_count - scout_count
+		for _i: int in range(regular_count):
+			enemy_list.append("basic")
+		for _i: int in range(scout_count):
+			enemy_list.append("scout")
+	else:
+		for _i: int in range(total_count):
+			enemy_list.append("basic")
+	enemy_list.shuffle()
+
+	_build_spawn_queue(enemy_list, spawn_interval, use_bursts)
+
+
+func _start_legacy_wave(wave_num: int) -> void:
+	var legacy_idx: int = wave_num - 11
+	var data: Dictionary = LEGACY_WAVE_DATA[legacy_idx]
+	var enemy_list: Array[String] = []
+	for enemy_type: String in data:
+		for _i: int in range(data[enemy_type]):
+			enemy_list.append(enemy_type)
+	enemy_list.shuffle()
+	_build_spawn_queue(enemy_list, 0.5, false)
+
+
+# Populates _spawn_queue and _spawn_delays.
+# _spawn_delays[i] is the gap to wait AFTER spawning enemy i before spawning i+1.
+func _build_spawn_queue(enemy_list: Array[String], spawn_interval: float, use_bursts: bool) -> void:
+	var n: int = enemy_list.size()
+	if n == 0:
+		return
+
+	if use_bursts:
+		# Wave 8+: spawn in clusters of 3–4 with tight inner gaps, full interval between clusters
+		var i: int = 0
+		while i < n:
+			var burst_size: int = randi_range(3, 4)
+			var burst_end: int = mini(i + burst_size, n)
+			for j: int in range(i, burst_end):
+				_spawn_queue.append(enemy_list[j])
+				if j < n - 1:
+					if j < burst_end - 1:
+						_spawn_delays.append(BURST_INNER_DELAY)
+					else:
+						_spawn_delays.append(spawn_interval)
+			i = burst_end
+	else:
+		for i: int in range(n):
+			_spawn_queue.append(enemy_list[i])
+			if i < n - 1:
+				_spawn_delays.append(spawn_interval)
 
 
 func _process(delta: float) -> void:
 	if not _is_spawning or _spawn_queue.is_empty():
 		return
 	_spawn_timer -= delta
-	if _spawn_timer > 0.0:
-		return
-
-	var wave_num: int = GameManager.current_wave
-	if wave_num >= 8:
-		# Burst mode: spawn a cluster of 3-4 simultaneously, then pause
-		var burst_size: int = randi_range(BURST_SIZE_MIN, BURST_SIZE_MAX)
-		var i: int = 0
-		while i < burst_size and not _spawn_queue.is_empty():
-			_do_spawn(_spawn_queue.pop_front())
-			i += 1
-		_spawn_timer = BURST_PAUSE
-	else:
+	if _spawn_timer <= 0.0:
 		_do_spawn(_spawn_queue.pop_front())
-		_spawn_timer = _current_spawn_interval
-
-	if _spawn_queue.is_empty():
-		_is_spawning = false
+		if not _spawn_queue.is_empty() and not _spawn_delays.is_empty():
+			_spawn_timer = _spawn_delays.pop_front()
+		else:
+			_spawn_timer = 0.0
+		if _spawn_queue.is_empty():
+			_is_spawning = false
 
 
 func _do_spawn(enemy_type: String) -> void:
@@ -152,27 +176,24 @@ func _do_spawn(enemy_type: String) -> void:
 		return
 	var packed: PackedScene = load(scene_path)
 	var enemy: Node2D = packed.instantiate() as Node2D
-	var wave_num: int = GameManager.current_wave
 
-	if wave_num <= 10:
-		# Plan A: apply per-wave HP and speed multiplier
-		var base_hp: int = WAVE_HP[wave_num - 1]
-		var speed_mult: float = WAVE_SPEED_MULT[wave_num - 1]
+	if _plan_a_wave:
+		# Apply Plan A per-wave stats before the node enters the scene tree
+		enemy._hp = _current_wave_hp
+		enemy.speed = PLAN_A_BASE_SPEED * _current_wave_speed_mult
 		if enemy_type == "scout":
-			# Scout: 2x the wave's normal speed, 40% of wave base HP
-			enemy._hp = int(base_hp * 0.4)
-			enemy.speed = enemy.speed * speed_mult * 2.0
+			# Scout: 2× wave speed, 40 % wave HP; awards scout kill-gold (4g)
+			enemy._hp = int(_current_wave_hp * 0.4)
+			enemy.speed = PLAN_A_BASE_SPEED * _current_wave_speed_mult * 2.0
 			enemy._enemy_type = "scout"
-		else:
-			enemy._hp = base_hp
-			enemy.speed = enemy.speed * speed_mult
 	else:
-		# Waves 11+: exponential scaling from base enemy stats
-		var multiplier_steps: int = wave_num - 10
-		var speed_scale: float = pow(1.05, multiplier_steps)
-		var hp_scale: float = pow(1.10, multiplier_steps)
-		enemy.speed *= speed_scale
-		enemy._hp = int(enemy._hp * hp_scale)
+		# Legacy waves 11-25: compound scaling from wave 10 baseline
+		if GameManager.current_wave > 10:
+			var multiplier_steps: int = GameManager.current_wave - 10
+			var speed_mult: float = pow(1.05, multiplier_steps)
+			var hp_mult: float = pow(1.10, multiplier_steps)
+			enemy.speed *= speed_mult
+			enemy._hp = int(enemy._hp * hp_mult)
 
 	enemy.position = _get_random_edge_position()
 	_enemies_parent.add_child(enemy)
