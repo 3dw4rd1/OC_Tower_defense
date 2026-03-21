@@ -5,6 +5,15 @@
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
 
+[node name="BottomBarBG" type="ColorRect" parent="."]
+anchor_left = 0.0
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -64.0
+offset_bottom = 0.0
+color = Color(0.12, 0.12, 0.14, 1.0)
+
 [node name="BottomBar" type="VBoxContainer" parent="."]
 anchor_left = 0.0
 anchor_right = 1.0
@@ -19,21 +28,23 @@ theme_override_constants/separation = 20
 
 [node name="GoldLabel" type="Label" parent="BottomBar/StatsBar"]
 size_flags_horizontal = 3
-text = "Gold: 100"
-
-[node name="HPLabel" type="Label" parent="BottomBar/StatsBar"]
-size_flags_horizontal = 3
-text = "HP: 20 / 20"
+text = "💰 Gold: 100"
+horizontal_alignment = 1
 
 [node name="WaveLabel" type="Label" parent="BottomBar/StatsBar"]
 size_flags_horizontal = 3
-text = "Wave 0 / 10"
+text = "🌊 Wave 0 / 25"
 horizontal_alignment = 1
 
 [node name="EnemyCountLabel" type="Label" parent="BottomBar/StatsBar"]
 size_flags_horizontal = 3
-text = "Enemies: 0"
-horizontal_alignment = 2
+text = "👾 Enemies: 0"
+horizontal_alignment = 1
+
+[node name="HPLabel" type="Label" parent="BottomBar/StatsBar"]
+size_flags_horizontal = 3
+text = "❤️ HP: 20 / 20"
+horizontal_alignment = 1
 
 [node name="TowerPanel" type="HBoxContainer" parent="BottomBar"]
 size_flags_vertical = 3
