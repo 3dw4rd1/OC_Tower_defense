@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/enemies/enemy_tank.gd" id="1_tank"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
-size = Vector2(20, 20)
+size = Vector2(14, 14)
 
 [node name="EnemyTank" type="CharacterBody2D"]
 script = ExtResource("1_tank")
