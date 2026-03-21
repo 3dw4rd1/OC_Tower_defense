@@ -10,6 +10,7 @@ var attack_speed: float = 1.0  # attacks per second
 var projectile_color: Color = Color(0.86, 0.63, 0.24)
 var projectile_aoe_radius: float = 0.0
 var projectile_slow_duration: float = 0.0
+var range_color: Color = Color(1.0, 1.0, 1.0, 1.0)
 
 var _attack_timer: float = 0.0
 var _enemies_in_range: Array[Node2D] = []
@@ -34,16 +35,17 @@ func _add_range_indicator() -> void:
 	_range_indicator.set_meta("radius", range_px)
 	_range_indicator.draw.connect(_draw_range_indicator.bind(_range_indicator))
 	add_child(_range_indicator)
-	_range_indicator.visible = false  # Hidden by default; show during placement only
+	_range_indicator.visible = false  # Hidden by default; show on hover or during placement
 
 
 func _draw_range_indicator(indicator: Node2D) -> void:
 	var r: float = indicator.get_meta("radius")
-	# Filled translucent circle
-	indicator.draw_circle(Vector2.ZERO, r, Color(1.0, 1.0, 1.0, 0.08))
+	# Filled translucent circle using range_color at low alpha
+	var fill_color := Color(range_color.r, range_color.g, range_color.b, 0.08)
+	indicator.draw_circle(Vector2.ZERO, r, fill_color)
 	# Dashed outline — draw as a series of short arcs approximated by line segments
 	var steps: int = 64
-	var dash: int = 3   # draw 3, skip 1 (creates dashed feel)
+	var outline_color := Color(range_color.r, range_color.g, range_color.b, 0.55)
 	for i: int in range(steps):
 		if i % 4 == 3:
 			continue  # gap
@@ -51,7 +53,7 @@ func _draw_range_indicator(indicator: Node2D) -> void:
 		var a1: float = (float(i + 1) / steps) * TAU
 		var p0: Vector2 = Vector2(cos(a0), sin(a0)) * r
 		var p1: Vector2 = Vector2(cos(a1), sin(a1)) * r
-		indicator.draw_line(p0, p1, Color(1.0, 1.0, 1.0, 0.55), 1.0)
+		indicator.draw_line(p0, p1, outline_color, 1.0)
 
 
 func show_range_indicator() -> void:
@@ -70,6 +72,12 @@ func _process(delta: float) -> void:
 	if _attack_timer <= 0.0:
 		_attack_timer = 1.0 / attack_speed
 		_do_attack()
+	# Hover to show/hide range ring on placed towers
+	var dist: float = get_global_mouse_position().distance_to(global_position)
+	if dist < 12.0:
+		show_range_indicator()
+	else:
+		hide_range_indicator()
 
 
 func _do_attack() -> void:

@@ -6,6 +6,15 @@ extends CanvasLayer
 @onready var _enemy_count_label: Label = $EnemyCountLabel
 @onready var _game_over_overlay: Control = $GameOverOverlay
 @onready var _victory_overlay: Control = $VictoryOverlay
+@onready var _basic_btn: Button = $TowerPanel/BasicBtn
+@onready var _sniper_btn: Button = $TowerPanel/SniperBtn
+@onready var _splash_btn: Button = $TowerPanel/SplashBtn
+@onready var _slow_btn: Button = $TowerPanel/SlowBtn
+
+const SELECTED_MODULATE: Color = Color(1.5, 1.5, 0.6, 1.0)
+const NORMAL_MODULATE: Color = Color(1.0, 1.0, 1.0, 1.0)
+
+var _selected_type: String = ""
 
 
 func _ready() -> void:
@@ -23,6 +32,14 @@ func _ready() -> void:
 	_enemy_count_label.text = "Enemies: 0"
 	_game_over_overlay.visible = false
 	_victory_overlay.visible = false
+
+
+func set_selected_tower_button(tower_type: String) -> void:
+	_selected_type = tower_type
+	_basic_btn.modulate = SELECTED_MODULATE if tower_type == "basic" else NORMAL_MODULATE
+	_sniper_btn.modulate = SELECTED_MODULATE if tower_type == "sniper" else NORMAL_MODULATE
+	_splash_btn.modulate = SELECTED_MODULATE if tower_type == "splash" else NORMAL_MODULATE
+	_slow_btn.modulate = SELECTED_MODULATE if tower_type == "slow" else NORMAL_MODULATE
 
 
 func _on_gold_changed(new_amount: int) -> void:
@@ -71,8 +88,15 @@ func _on_slow_button_pressed() -> void:
 
 func _select_tower(tower_type: String) -> void:
 	var game_map: Node = get_parent().get_node_or_null("GameMap")
-	if game_map:
-		game_map.selected_tower_type = tower_type
+	if not game_map:
+		return
+	# Toggle: clicking the already-selected type cancels placement
+	if _selected_type == tower_type:
+		game_map.cancel_placement()
+		set_selected_tower_button("")
+	else:
+		set_selected_tower_button(tower_type)
+		game_map.select_tower_type(tower_type)
 
 
 func _on_restart_button_pressed() -> void:

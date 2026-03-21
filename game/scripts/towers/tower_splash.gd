@@ -9,6 +9,7 @@ func _ready() -> void:
 	attack_speed = 1.0
 	projectile_color = Color(0.78, 0.31, 0.08)
 	projectile_aoe_radius = SPLASH_RADIUS
+	range_color = Color(1.0, 0.4, 0.15, 1.0)  # orange-red
 	super._ready()
 
 

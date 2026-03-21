@@ -6,4 +6,5 @@ func _ready() -> void:
 	range_px = 96.0
 	attack_speed = 1.0
 	projectile_color = Color(0.86, 0.63, 0.24)
+	range_color = Color(0.95, 0.75, 0.2, 1.0)  # warm gold
 	super._ready()

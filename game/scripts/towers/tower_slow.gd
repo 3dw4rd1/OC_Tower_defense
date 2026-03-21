@@ -9,6 +9,7 @@ func _ready() -> void:
 	attack_speed = 2.0
 	projectile_color = Color(0.31, 0.63, 0.90)
 	projectile_slow_duration = SLOW_DURATION
+	range_color = Color(0.7, 0.3, 1.0, 1.0)  # purple
 	super._ready()
 
 
