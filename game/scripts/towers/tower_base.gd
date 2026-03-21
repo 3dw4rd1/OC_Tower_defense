@@ -13,6 +13,7 @@ var projectile_slow_duration: float = 0.0
 
 var _attack_timer: float = 0.0
 var _enemies_in_range: Array[Node2D] = []
+var _range_indicator: Node2D = null
 
 @onready var _range_area: Area2D = $RangeArea
 
@@ -23,6 +24,45 @@ func _ready() -> void:
 	var shape: CircleShape2D = _range_area.get_node("CollisionShape2D").shape as CircleShape2D
 	if shape:
 		shape.radius = range_px
+	_add_range_indicator()
+
+
+func _add_range_indicator() -> void:
+	_range_indicator = Node2D.new()
+	_range_indicator.name = "RangeIndicator"
+	# Store range_px in metadata so the draw callback can read it
+	_range_indicator.set_meta("radius", range_px)
+	_range_indicator.draw.connect(_draw_range_indicator.bind(_range_indicator))
+	add_child(_range_indicator)
+	_range_indicator.visible = false  # Hidden by default; show during placement only
+
+
+func _draw_range_indicator(indicator: Node2D) -> void:
+	var r: float = indicator.get_meta("radius")
+	# Filled translucent circle
+	indicator.draw_circle(Vector2.ZERO, r, Color(1.0, 1.0, 1.0, 0.08))
+	# Dashed outline — draw as a series of short arcs approximated by line segments
+	var steps: int = 64
+	var dash: int = 3   # draw 3, skip 1 (creates dashed feel)
+	for i: int in range(steps):
+		if i % 4 == 3:
+			continue  # gap
+		var a0: float = (float(i) / steps) * TAU
+		var a1: float = (float(i + 1) / steps) * TAU
+		var p0: Vector2 = Vector2(cos(a0), sin(a0)) * r
+		var p1: Vector2 = Vector2(cos(a1), sin(a1)) * r
+		indicator.draw_line(p0, p1, Color(1.0, 1.0, 1.0, 0.55), 1.0)
+
+
+func show_range_indicator() -> void:
+	if _range_indicator:
+		_range_indicator.visible = true
+		_range_indicator.queue_redraw()
+
+
+func hide_range_indicator() -> void:
+	if _range_indicator:
+		_range_indicator.visible = false
 
 
 func _process(delta: float) -> void:

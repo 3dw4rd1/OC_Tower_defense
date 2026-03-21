@@ -24,6 +24,7 @@ const BASE_TILE: Vector2i = Vector2i(35, 16)
 var selected_tower_type: String = ""
 var _placed_tiles: Dictionary = {}
 var _towers_container: Node2D = null
+var _preview_tower: Node2D = null
 
 
 func _ready() -> void:
@@ -33,6 +34,40 @@ func _ready() -> void:
 
 func set_towers_container(container: Node2D) -> void:
 	_towers_container = container
+
+
+func select_tower_type(tower_type: String) -> void:
+	selected_tower_type = tower_type
+	_refresh_preview()
+
+
+func _refresh_preview() -> void:
+	# Remove old preview
+	if _preview_tower:
+		_preview_tower.queue_free()
+		_preview_tower = null
+	if selected_tower_type.is_empty():
+		return
+	# Spawn new ghost preview — non-functional (no area, no timer)
+	var scene_path: String = TOWER_SCENES.get(selected_tower_type, "") as String
+	if scene_path.is_empty() or not ResourceLoader.exists(scene_path):
+		return
+	var packed: PackedScene = load(scene_path)
+	_preview_tower = packed.instantiate() as Node2D
+	# Make it semi-transparent and disable its combat logic
+	_preview_tower.modulate = Color(1.0, 1.0, 1.0, 0.5)
+	_preview_tower.set_process(false)
+	_preview_tower.set_physics_process(false)
+	add_child(_preview_tower)
+	_preview_tower.show_range_indicator()
+
+
+func _process(_delta: float) -> void:
+	if _preview_tower == null:
+		return
+	var world_pos: Vector2 = get_global_mouse_position()
+	var tile_pos: Vector2i = PathfindingManager.world_to_tile(world_pos)
+	_preview_tower.global_position = PathfindingManager.tile_to_world(tile_pos)
 
 
 func _unhandled_input(event: InputEvent) -> void:
