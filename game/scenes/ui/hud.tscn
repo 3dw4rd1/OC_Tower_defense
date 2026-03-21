@@ -66,6 +66,10 @@ text = "Splash (120g)"
 size_flags_horizontal = 3
 text = "Slow (80g)"
 
+[node name="WallBtn" type="Button" parent="TowerPanel"]
+size_flags_horizontal = 3
+text = "Wall (25g)"
+
 [node name="GameOverOverlay" type="Control" parent="."]
 visible = false
 anchor_right = 1.0
@@ -134,5 +138,6 @@ text = "Play Again"
 [connection signal="pressed" from="TowerPanel/SniperBtn" to="." method="_on_sniper_button_pressed"]
 [connection signal="pressed" from="TowerPanel/SplashBtn" to="." method="_on_splash_button_pressed"]
 [connection signal="pressed" from="TowerPanel/SlowBtn" to="." method="_on_slow_button_pressed"]
+[connection signal="pressed" from="TowerPanel/WallBtn" to="." method="_on_wall_button_pressed"]
 [connection signal="pressed" from="GameOverOverlay/RestartButton" to="." method="_on_restart_button_pressed"]
 [connection signal="pressed" from="VictoryOverlay/RestartButton" to="." method="_on_restart_button_pressed"]

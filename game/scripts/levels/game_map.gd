@@ -10,6 +10,7 @@ const TOWER_SCENES: Dictionary = {
 	"sniper": "res://scenes/towers/TowerSniper.tscn",
 	"splash": "res://scenes/towers/TowerSplash.tscn",
 	"slow":   "res://scenes/towers/TowerSlow.tscn",
+	"wall":   "res://scenes/towers/TowerWall.tscn",
 }
 
 const TOWER_COSTS: Dictionary = {
@@ -17,7 +18,10 @@ const TOWER_COSTS: Dictionary = {
 	"sniper": 100,
 	"splash": 120,
 	"slow":   80,
+	"wall":   25,
 }
+
+const MAX_WALL_TOWERS: int = 20
 
 const BASE_TILE: Vector2i = Vector2i(35, 16)
 
@@ -25,6 +29,7 @@ var selected_tower_type: String = ""
 var _placed_tiles: Dictionary = {}
 var _towers_container: Node2D = null
 var _preview_tower: Node2D = null
+var _wall_count: int = 0
 
 
 func _ready() -> void:
@@ -88,7 +93,8 @@ func _refresh_preview() -> void:
 	for child in _preview_tower.get_children():
 		if child is StaticBody2D or child is CharacterBody2D:
 			child.process_mode = Node.PROCESS_MODE_DISABLED
-	_preview_tower.show_range_indicator()
+	if _preview_tower.has_method("show_range_indicator"):
+		_preview_tower.show_range_indicator()
 
 
 func _get_all_collision_shapes(node: Node) -> Array:
@@ -108,6 +114,8 @@ func _is_tile_valid(tile_pos: Vector2i) -> bool:
 	if TerrainManager.is_obstacle(tile_pos):
 		return false
 	if _placed_tiles.has(tile_pos):
+		return false
+	if selected_tower_type == "wall" and _wall_count >= MAX_WALL_TOWERS:
 		return false
 	var cost: int = TOWER_COSTS.get(selected_tower_type, 0) as int
 	if GameManager.gold < cost:
@@ -190,6 +198,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			_towers_container.add_child(tower)
 		else:
 			get_parent().add_child(tower)
+
+	# Track wall count and notify HUD
+	if selected_tower_type == "wall":
+		_wall_count += 1
+		var hud: Node = get_parent().get_node_or_null("HUD")
+		if hud and hud.has_method("update_wall_button"):
+			hud.update_wall_button(_wall_count)
 
 	# Clear selection after successful placement
 	_cancel_selection()

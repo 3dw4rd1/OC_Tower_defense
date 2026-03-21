@@ -10,11 +10,13 @@ extends CanvasLayer
 @onready var _sniper_btn: Button = $TowerPanel/SniperBtn
 @onready var _splash_btn: Button = $TowerPanel/SplashBtn
 @onready var _slow_btn: Button = $TowerPanel/SlowBtn
+@onready var _wall_btn: Button = $TowerPanel/WallBtn
 
 const SELECTED_MODULATE: Color = Color(1.5, 1.5, 0.6, 1.0)
 const NORMAL_MODULATE: Color = Color(1.0, 1.0, 1.0, 1.0)
 
 var _selected_type: String = ""
+var _wall_count: int = 0
 
 
 func _ready() -> void:
@@ -40,6 +42,7 @@ func set_selected_tower_button(tower_type: String) -> void:
 	_sniper_btn.modulate = SELECTED_MODULATE if tower_type == "sniper" else NORMAL_MODULATE
 	_splash_btn.modulate = SELECTED_MODULATE if tower_type == "splash" else NORMAL_MODULATE
 	_slow_btn.modulate = SELECTED_MODULATE if tower_type == "slow" else NORMAL_MODULATE
+	_wall_btn.modulate = SELECTED_MODULATE if tower_type == "wall" else NORMAL_MODULATE
 
 
 func _on_gold_changed(new_amount: int) -> void:
@@ -84,6 +87,15 @@ func _on_splash_button_pressed() -> void:
 
 func _on_slow_button_pressed() -> void:
 	_select_tower("slow")
+
+
+func _on_wall_button_pressed() -> void:
+	_select_tower("wall")
+
+
+func update_wall_button(count: int) -> void:
+	_wall_count = count
+	_wall_btn.text = "Wall (25g)\n%d/20" % count
 
 
 func _select_tower(tower_type: String) -> void:
