@@ -71,14 +71,32 @@ func _refresh_preview() -> void:
 	_preview_tower.modulate = Color(1.0, 1.0, 1.0, 0.5)
 	# Add to scene first so _ready() runs and @onready vars are set
 	add_child(_preview_tower)
-	# Disable combat processing after _ready() has initialised the node
+	# Disable all processing and input on the ghost so it never intercepts clicks
 	_preview_tower.set_process(false)
 	_preview_tower.set_physics_process(false)
+	_preview_tower.process_mode = Node.PROCESS_MODE_DISABLED
 	var range_area := _preview_tower.get_node_or_null("RangeArea") as Area2D
 	if range_area:
 		range_area.monitoring = false
 		range_area.monitorable = false
+		range_area.input_pickable = false
+	# Disable all collision shapes recursively
+	for shape in _get_all_collision_shapes(_preview_tower):
+		shape.disabled = true
+	# Disable any physics bodies
+	for child in _preview_tower.get_children():
+		if child is StaticBody2D or child is CharacterBody2D:
+			child.process_mode = Node.PROCESS_MODE_DISABLED
 	_preview_tower.show_range_indicator()
+
+
+func _get_all_collision_shapes(node: Node) -> Array:
+	var result: Array = []
+	for child in node.get_children():
+		if child is CollisionShape2D:
+			result.append(child)
+		result.append_array(_get_all_collision_shapes(child))
+	return result
 
 
 func _is_tile_valid(tile_pos: Vector2i) -> bool:
@@ -139,10 +157,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	# Place obstacle temporarily and validate path still exists (BUG-04)
 	PathfindingManager.place_obstacle(tile_pos)
-	var path_valid: bool = PathfindingManager.has_valid_path(Vector2i(0, 16), BASE_TILE)
-
+	var sample_tiles: Array = [Vector2i(0, 16), Vector2i(70, 16), Vector2i(35, 0), Vector2i(35, 32)]
+	var path_valid: bool = false
+	for sample in sample_tiles:
+		if not PathfindingManager.is_point_disabled(sample):
+			if PathfindingManager.has_valid_path(sample, BASE_TILE):
+				path_valid = true
+				break
 	if not path_valid:
-		# Reject — restore and notify
 		PathfindingManager.remove_obstacle(tile_pos)
 		push_warning("Tower placement rejected: would fully block path")
 		return

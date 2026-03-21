@@ -40,6 +40,10 @@ func remove_obstacle(tile_pos: Vector2i) -> void:
 	_astar.set_point_disabled(_tile_to_id(tile_pos), false)
 
 
+func is_point_disabled(tile_pos: Vector2i) -> bool:
+	return _astar.is_point_disabled(_tile_to_id(tile_pos))
+
+
 func has_valid_path(from: Vector2i, to: Vector2i) -> bool:
 	var path: PackedVector2Array = _astar.get_point_path(
 		_tile_to_id(from), _tile_to_id(to)
