@@ -28,7 +28,7 @@ func _ready() -> void:
 
 	_gold_label.text = "Gold: %d" % GameManager.gold
 	_hp_label.text = "HP: %d / 20" % GameManager.base_hp
-	_wave_label.text = "Wave %d / 10" % GameManager.current_wave
+	_wave_label.text = "Wave %d / %d" % [GameManager.current_wave, GameManager.TOTAL_WAVES]
 	_enemy_count_label.text = "Enemies: 0"
 	_game_over_overlay.visible = false
 	_victory_overlay.visible = false
@@ -51,7 +51,7 @@ func _on_base_hp_changed(new_hp: int) -> void:
 
 
 func _on_wave_started(wave_num: int) -> void:
-	_wave_label.text = "Wave %d / 10" % wave_num
+	_wave_label.text = "Wave %d / %d" % [wave_num, GameManager.TOTAL_WAVES]
 
 
 func _on_wave_completed(_wave_num: int) -> void:
