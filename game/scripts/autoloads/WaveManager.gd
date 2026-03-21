@@ -18,6 +18,21 @@ const WAVE_DATA: Array = [
 	{"basic": 10, "fast": 6},
 	{"tank": 4, "fast": 8},
 	{"basic": 10, "fast": 10, "tank": 6},
+	{"basic": 15, "fast": 8},
+	{"fast": 10, "tank": 5},
+	{"basic": 12, "fast": 8, "tank": 4},
+	{"fast": 12, "tank": 8},
+	{"basic": 20, "fast": 10, "tank": 8},
+	{"fast": 15, "tank": 6},
+	{"basic": 10, "fast": 15, "tank": 5},
+	{"fast": 10, "tank": 12},
+	{"basic": 15, "fast": 12, "tank": 10},
+	{"basic": 25, "fast": 15, "tank": 10},
+	{"fast": 15, "tank": 10},
+	{"basic": 20, "fast": 20, "tank": 8},
+	{"fast": 20, "tank": 15},
+	{"basic": 25, "fast": 20, "tank": 15},
+	{"basic": 30, "fast": 25, "tank": 20},
 ]
 
 const ENEMY_SCENES: Dictionary = {
@@ -86,6 +101,12 @@ func _do_spawn(enemy_type: String) -> void:
 		return
 	var packed: PackedScene = load(scene_path)
 	var enemy: Node2D = packed.instantiate() as Node2D
+	if GameManager.current_wave > 10:
+		var multiplier_steps: int = GameManager.current_wave - 10
+		var speed_mult: float = pow(1.05, multiplier_steps)
+		var hp_mult: float = pow(1.10, multiplier_steps)
+		enemy.speed *= speed_mult
+		enemy._hp = int(enemy._hp * hp_mult)
 	enemy.position = _get_random_edge_position()
 	_enemies_parent.add_child(enemy)
 	_alive_count += 1

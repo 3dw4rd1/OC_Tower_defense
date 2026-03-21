@@ -14,12 +14,12 @@ signal base_hp_changed(new_hp: int)
 signal game_over
 signal victory
 
-const TOTAL_WAVES: int = 10
+const TOTAL_WAVES: int = 25
 
 var state: GameState = GameState.SETUP
 var current_wave: int = 0
 var base_hp: int = 20
-var gold: int = 100
+var gold: int = 500
 
 
 func add_gold(amount: int) -> void:
