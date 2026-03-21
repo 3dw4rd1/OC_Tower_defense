@@ -139,10 +139,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	# Place obstacle temporarily and validate path still exists (BUG-04)
 	PathfindingManager.place_obstacle(tile_pos)
-	var path_valid: bool = (
-		PathfindingManager.has_valid_path(Vector2i(0, 16), BASE_TILE) or
-		PathfindingManager.has_valid_path(Vector2i(16, 0), BASE_TILE)
-	)
+	var path_valid: bool = PathfindingManager.has_valid_path(Vector2i(0, 16), BASE_TILE)
 
 	if not path_valid:
 		# Reject — restore and notify
