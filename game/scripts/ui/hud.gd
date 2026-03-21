@@ -29,7 +29,7 @@ func _ready() -> void:
 	WaveManager.enemy_count_changed.connect(_on_enemy_count_changed)
 
 	_gold_label.text = "Gold: %d" % GameManager.gold
-	_hp_label.text = "HP: %d / 20" % GameManager.base_hp
+	_hp_label.text = "HP: %d / 50" % GameManager.base_hp
 	_wave_label.text = "Wave %d / %d" % [GameManager.current_wave, GameManager.TOTAL_WAVES]
 	_enemy_count_label.text = "Enemies: 0"
 	_game_over_overlay.visible = false
@@ -50,7 +50,7 @@ func _on_gold_changed(new_amount: int) -> void:
 
 
 func _on_base_hp_changed(new_hp: int) -> void:
-	_hp_label.text = "HP: %d / 20" % new_hp
+	_hp_label.text = "HP: %d / 50" % new_hp
 
 
 func _on_wave_started(wave_num: int) -> void:
