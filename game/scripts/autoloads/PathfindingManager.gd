@@ -2,10 +2,10 @@ extends Node
 
 signal obstacle_changed
 
-const GRID_COLS: int = 71
-const GRID_ROWS: int = 33
+const GRID_COLS: int = 80
+const GRID_ROWS: int = 41
 const TILE_SIZE: int = 16
-const BASE_TILE: Vector2i = Vector2i(35, 16)
+const BASE_TILE: Vector2i = Vector2i(40, 20)
 
 var _astar: AStar2D = AStar2D.new()
 
@@ -64,14 +64,14 @@ func get_astar_path(from: Vector2i, to: Vector2i) -> Array[Vector2]:
 func tile_to_world(tile_pos: Vector2i) -> Vector2:
 	return Vector2(
 		tile_pos.x * TILE_SIZE + TILE_SIZE / 2,
-		tile_pos.y * TILE_SIZE + TILE_SIZE / 2 + 50
+		tile_pos.y * TILE_SIZE + TILE_SIZE / 2
 	)
 
 
 func world_to_tile(world_pos: Vector2) -> Vector2i:
 	return Vector2i(
 		floori(world_pos.x / TILE_SIZE),
-		floori((world_pos.y - 50) / TILE_SIZE)
+		floori(world_pos.y / TILE_SIZE)
 	)
 
 

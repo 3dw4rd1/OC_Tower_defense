@@ -1,7 +1,7 @@
 extends TileMap
 
-const GRID_COLS: int = 71
-const GRID_ROWS: int = 33
+const GRID_COLS: int = 80
+const GRID_ROWS: int = 41
 # Dark green — placeholder ground tile (grass)
 const GROUND_COLOR: Color = Color(0.18, 0.38, 0.18, 1.0)
 
@@ -23,7 +23,7 @@ const TOWER_COSTS: Dictionary = {
 
 const MAX_WALL_TOWERS: int = 20
 
-const BASE_TILE: Vector2i = Vector2i(35, 16)
+const BASE_TILE: Vector2i = Vector2i(40, 20)
 
 var selected_tower_type: String = ""
 var _placed_tiles: Dictionary = {}

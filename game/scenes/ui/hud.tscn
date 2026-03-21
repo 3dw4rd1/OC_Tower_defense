@@ -5,68 +5,57 @@
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
 
-[node name="GoldLabel" type="Label" parent="."]
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 200.0
-offset_bottom = 36.0
+[node name="BottomBar" type="VBoxContainer" parent="."]
+anchor_left = 0.0
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -64.0
+offset_bottom = 0.0
+
+[node name="StatsBar" type="HBoxContainer" parent="BottomBar"]
+custom_minimum_size = Vector2(0, 28)
+theme_override_constants/separation = 20
+
+[node name="GoldLabel" type="Label" parent="BottomBar/StatsBar"]
+size_flags_horizontal = 3
 text = "Gold: 100"
 
-[node name="HPLabel" type="Label" parent="."]
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -200.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = 36.0
+[node name="HPLabel" type="Label" parent="BottomBar/StatsBar"]
+size_flags_horizontal = 3
 text = "HP: 20 / 20"
-horizontal_alignment = 2
 
-[node name="WaveLabel" type="Label" parent="."]
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -100.0
-offset_top = 10.0
-offset_right = 100.0
-offset_bottom = 36.0
+[node name="WaveLabel" type="Label" parent="BottomBar/StatsBar"]
+size_flags_horizontal = 3
 text = "Wave 0 / 10"
 horizontal_alignment = 1
 
-[node name="EnemyCountLabel" type="Label" parent="."]
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -100.0
-offset_top = 40.0
-offset_right = 100.0
-offset_bottom = 62.0
+[node name="EnemyCountLabel" type="Label" parent="BottomBar/StatsBar"]
+size_flags_horizontal = 3
 text = "Enemies: 0"
-horizontal_alignment = 1
+horizontal_alignment = 2
 
-[node name="TowerPanel" type="HBoxContainer" parent="."]
-anchor_top = 1.0
-anchor_bottom = 1.0
-anchor_right = 1.0
-offset_top = -50.0
-offset_bottom = 0.0
+[node name="TowerPanel" type="HBoxContainer" parent="BottomBar"]
+size_flags_vertical = 3
 alignment = 1
 
-[node name="BasicBtn" type="Button" parent="TowerPanel"]
+[node name="BasicBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
 text = "Basic (50g)"
 
-[node name="SniperBtn" type="Button" parent="TowerPanel"]
+[node name="SniperBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
 text = "Sniper (100g)"
 
-[node name="SplashBtn" type="Button" parent="TowerPanel"]
+[node name="SplashBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
 text = "Splash (120g)"
 
-[node name="SlowBtn" type="Button" parent="TowerPanel"]
+[node name="SlowBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
 text = "Slow (80g)"
 
-[node name="WallBtn" type="Button" parent="TowerPanel"]
+[node name="WallBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
 text = "Wall (25g)"
 
@@ -134,10 +123,10 @@ offset_right = 80.0
 offset_bottom = 36.0
 text = "Play Again"
 
-[connection signal="pressed" from="TowerPanel/BasicBtn" to="." method="_on_basic_button_pressed"]
-[connection signal="pressed" from="TowerPanel/SniperBtn" to="." method="_on_sniper_button_pressed"]
-[connection signal="pressed" from="TowerPanel/SplashBtn" to="." method="_on_splash_button_pressed"]
-[connection signal="pressed" from="TowerPanel/SlowBtn" to="." method="_on_slow_button_pressed"]
-[connection signal="pressed" from="TowerPanel/WallBtn" to="." method="_on_wall_button_pressed"]
+[connection signal="pressed" from="BottomBar/TowerPanel/BasicBtn" to="." method="_on_basic_button_pressed"]
+[connection signal="pressed" from="BottomBar/TowerPanel/SniperBtn" to="." method="_on_sniper_button_pressed"]
+[connection signal="pressed" from="BottomBar/TowerPanel/SplashBtn" to="." method="_on_splash_button_pressed"]
+[connection signal="pressed" from="BottomBar/TowerPanel/SlowBtn" to="." method="_on_slow_button_pressed"]
+[connection signal="pressed" from="BottomBar/TowerPanel/WallBtn" to="." method="_on_wall_button_pressed"]
 [connection signal="pressed" from="GameOverOverlay/RestartButton" to="." method="_on_restart_button_pressed"]
 [connection signal="pressed" from="VictoryOverlay/RestartButton" to="." method="_on_restart_button_pressed"]

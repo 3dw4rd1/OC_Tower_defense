@@ -1,8 +1,8 @@
 extends Node
 
-const GRID_COLS: int = 71
-const GRID_ROWS: int = 33
-const BASE_TILE: Vector2i = Vector2i(35, 16)
+const GRID_COLS: int = 80
+const GRID_ROWS: int = 41
+const BASE_TILE: Vector2i = Vector2i(40, 20)
 # Keep this many tiles clear from every edge so spawn points are never blocked
 const EDGE_BUFFER: int = 2
 

@@ -1,16 +1,16 @@
 extends CanvasLayer
 
-@onready var _gold_label: Label = $GoldLabel
-@onready var _hp_label: Label = $HPLabel
-@onready var _wave_label: Label = $WaveLabel
-@onready var _enemy_count_label: Label = $EnemyCountLabel
+@onready var _gold_label: Label = $BottomBar/StatsBar/GoldLabel
+@onready var _hp_label: Label = $BottomBar/StatsBar/HPLabel
+@onready var _wave_label: Label = $BottomBar/StatsBar/WaveLabel
+@onready var _enemy_count_label: Label = $BottomBar/StatsBar/EnemyCountLabel
 @onready var _game_over_overlay: Control = $GameOverOverlay
 @onready var _victory_overlay: Control = $VictoryOverlay
-@onready var _basic_btn: Button = $TowerPanel/BasicBtn
-@onready var _sniper_btn: Button = $TowerPanel/SniperBtn
-@onready var _splash_btn: Button = $TowerPanel/SplashBtn
-@onready var _slow_btn: Button = $TowerPanel/SlowBtn
-@onready var _wall_btn: Button = $TowerPanel/WallBtn
+@onready var _basic_btn: Button = $BottomBar/TowerPanel/BasicBtn
+@onready var _sniper_btn: Button = $BottomBar/TowerPanel/SniperBtn
+@onready var _splash_btn: Button = $BottomBar/TowerPanel/SplashBtn
+@onready var _slow_btn: Button = $BottomBar/TowerPanel/SlowBtn
+@onready var _wall_btn: Button = $BottomBar/TowerPanel/WallBtn
 
 const SELECTED_MODULATE: Color = Color(1.5, 1.5, 0.6, 1.0)
 const NORMAL_MODULATE: Color = Color(1.0, 1.0, 1.0, 1.0)
