@@ -70,8 +70,8 @@ func tile_to_world(tile_pos: Vector2i) -> Vector2:
 
 func world_to_tile(world_pos: Vector2) -> Vector2i:
 	return Vector2i(
-		int(world_pos.x / TILE_SIZE),
-		int((world_pos.y - 50) / TILE_SIZE)
+		floori(world_pos.x / TILE_SIZE),
+		floori((world_pos.y - 50) / TILE_SIZE)
 	)
 
 

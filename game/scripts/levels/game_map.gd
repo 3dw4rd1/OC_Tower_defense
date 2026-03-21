@@ -30,6 +30,7 @@ var _preview_tower: Node2D = null
 func _ready() -> void:
 	_build_tileset()
 	_fill_ground()
+	GameManager.game_over.connect(_cancel_selection)
 
 
 func set_towers_container(container: Node2D) -> void:
@@ -157,26 +158,31 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	# Place obstacle temporarily and validate path still exists (BUG-04)
 	PathfindingManager.place_obstacle(tile_pos)
-	var sample_tiles: Array = [Vector2i(0, 16), Vector2i(70, 16), Vector2i(35, 0), Vector2i(35, 32)]
 	var path_valid: bool = false
-	for sample in sample_tiles:
+	# Sample every 4th tile along all 4 edges — robust against players towering midpoints
+	var edge_samples: Array[Vector2i] = []
+	for x in range(0, PathfindingManager.GRID_COLS, 4):
+		edge_samples.append(Vector2i(x, 0))
+		edge_samples.append(Vector2i(x, PathfindingManager.GRID_ROWS - 1))
+	for y in range(0, PathfindingManager.GRID_ROWS, 4):
+		edge_samples.append(Vector2i(0, y))
+		edge_samples.append(Vector2i(PathfindingManager.GRID_COLS - 1, y))
+	for sample in edge_samples:
 		if not PathfindingManager.is_point_disabled(sample):
 			if PathfindingManager.has_valid_path(sample, BASE_TILE):
 				path_valid = true
 				break
 	if not path_valid:
 		PathfindingManager.remove_obstacle(tile_pos)
-		push_warning("Tower placement rejected: would fully block path")
+		_show_path_blocked_feedback()
 		return
 
-	# Confirm placement
+	# Confirm placement and spawn tower scene
 	var cost: int = TOWER_COSTS.get(selected_tower_type, 0) as int
-	GameManager.spend_gold(cost)
-	_placed_tiles[tile_pos] = true
-
-	# Spawn tower scene
 	var scene_path: String = TOWER_SCENES.get(selected_tower_type, "") as String
 	if not scene_path.is_empty() and ResourceLoader.exists(scene_path):
+		GameManager.spend_gold(cost)
+		_placed_tiles[tile_pos] = true
 		var packed: PackedScene = load(scene_path)
 		var tower: Node2D = packed.instantiate() as Node2D
 		tower.position = PathfindingManager.tile_to_world(tile_pos)
@@ -187,6 +193,21 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	# Clear selection after successful placement
 	_cancel_selection()
+
+
+func _show_path_blocked_feedback() -> void:
+	if _preview_tower:
+		_preview_tower.modulate = Color(1.0, 0.0, 0.0, 0.7)
+	var label: Label = Label.new()
+	label.text = "Path blocked!"
+	var ghost_world_pos: Vector2 = Vector2.ZERO
+	if _preview_tower:
+		ghost_world_pos = _preview_tower.global_position
+	label.global_position = ghost_world_pos + Vector2(-40, -20)
+	add_child(label)
+	var tween: Tween = create_tween()
+	tween.tween_property(label, "modulate:a", 0.0, 1.0)
+	tween.tween_callback(label.queue_free)
 
 
 func _build_tileset() -> void:

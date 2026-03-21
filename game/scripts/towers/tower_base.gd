@@ -33,7 +33,8 @@ func _add_range_indicator() -> void:
 	_range_indicator.name = "RangeIndicator"
 	# Store range_px in metadata so the draw callback can read it
 	_range_indicator.set_meta("radius", range_px)
-	_range_indicator.draw.connect(_draw_range_indicator.bind(_range_indicator))
+	var indicator_ref := _range_indicator
+	_range_indicator.draw.connect(func(): _draw_range_indicator(indicator_ref))
 	add_child(_range_indicator)
 	_range_indicator.visible = false  # Hidden by default; show on hover or during placement
 
@@ -74,7 +75,7 @@ func _process(delta: float) -> void:
 		_do_attack()
 	# Hover to show/hide range ring on placed towers
 	var dist: float = get_global_mouse_position().distance_to(global_position)
-	if dist < 12.0:
+	if dist < 24.0:
 		show_range_indicator()
 	else:
 		hide_range_indicator()
