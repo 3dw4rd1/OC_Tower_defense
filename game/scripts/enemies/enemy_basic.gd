@@ -57,7 +57,7 @@ func reach_base() -> void:
 
 
 func _die() -> void:
-	EconomyManager.award_kill_gold(_enemy_type)
+	EconomyManager.award_kill_gold(_enemy_type, GameManager.current_wave)
 	died.emit()
 	queue_free()
 
