@@ -1,6 +1,6 @@
 # Game Design Document — OC Tower Defense
 
-_Status: v1.1 — Decisions locked | Owner: Sage | Last updated: 2026-03-14_
+_Status: v1.2 — Decisions locked | Owner: Sage | Last updated: 2026-03-22_
 
 ---
 
@@ -11,7 +11,7 @@ _Status: v1.1 — Decisions locked | Owner: Sage | Last updated: 2026-03-14_
 **Engine:** Godot 4.x  
 **Platform:** PC (Windows/Linux/Mac)  
 **Scope:** Solo prototype — test case for OpenClaw agent-assisted game development  
-**Art style:** 16x16 pixel art — dark fantasy post-apocalyptic  
+**Art style:** 16x16 pixel art — zombie apocalypse survival horror  
 
 ### Pitch
 A strategic tower defense with no predefined lanes. Your towers are your maze. Enemies pathfind intelligently to your base — where you place your towers determines the path they take. Between waves, a skill tree lets you deeply upgrade each tower type, making progression feel powerful and personalised. Play actively or let it run while you're busy: the game is designed for both.
@@ -24,7 +24,7 @@ A strategic tower defense with no predefined lanes. Your towers are your maze. E
 ## 2. Core Loop
 
 ```
-Wave starts → Enemies pathfind to base → Kill enemies → Earn gold
+Wave starts → Zombies pathfind to base → Kill zombies → Earn gold
 → Wave ends → Auto-pause + gold bonus → Spend gold on towers & skill tree
 → Unpause → Next wave
 ```
@@ -35,7 +35,7 @@ The game supports two playstyles simultaneously:
 | Style | How it plays |
 |-------|-------------|
 | **Idle / Passive** | Set up between waves, auto-pause handles transitions, let waves resolve unattended |
-| **Active / Optimising** | Place towers mid-wave as gold accumulates, react to enemy positioning, min-max routes |
+| **Active / Optimising** | Place towers mid-wave as gold accumulates, react to zombie positioning, min-max routes |
 
 Neither is "wrong" — the game rewards both. Active play offers faster skill tree growth; passive play is still completable.
 
@@ -44,16 +44,23 @@ Neither is "wrong" — the game rewards both. Active play offers faster skill tr
 ## 3. Map
 
 - **Count:** 1 map (prototype scope)
-- **Layout:** Tile grid, open arena — no predefined paths or lanes
-- **Base position:** Centre of map (draws enemies from all directions)
+- **Layout:** Tile grid, open forest arena — no predefined paths or lanes
+- **Base position:** Centre of map (draws zombies from all directions)
 - **Tile size:** 16x16 px
 - **Recommended map size:** 32x32 tiles (512x512 px logical, scaled up)
 
+### Environment
+- **Ground:** Green grass tiles — the primary terrain
+- **Obstacles:** Forest trees (replacing rocks) — large, solid, impassable
+- **Decorations (non-blocking):** Mushrooms, fallen logs, undergrowth — visual flavour only
+- Trees are generated procedurally at map load using noise (same system as prior rocks)
+
 ### Pathfinding Rules
-- Enemies use A* pathfinding to navigate to the base each tick
-- Tower placement acts as obstacles — reshaping enemy routes in real time
+- Zombies use A* pathfinding to navigate to the base each tick
+- Tower placement acts as obstacles — reshaping zombie routes in real time
+- Trees are pre-placed obstacles that also influence routing from the start
 - **No full blocking:** the player cannot place towers in a way that removes all routes to the base. If a placement would fully block the path, it is rejected (visual feedback shown)
-- Enemies recalculate path when obstacles change
+- Zombies recalculate path when obstacles change
 
 ---
 
@@ -69,24 +76,24 @@ Neither is "wrong" — the game rewards both. Active play offers faster skill tr
 
 | Enemy | HP | Speed | Gold Drop | Role |
 |-------|-----|-------|-----------|------|
-| **Basic** | 30 | Medium | 5g | Balanced, introduces the core loop |
-| **Fast** | 15 | High | 8g | Punishes coverage gaps; tests maze routing |
-| **Tank** | 120 | Low | 20g | Soaks damage; stresses single-target towers |
+| **Shambler** | 30 | Medium | 5g | Standard zombie — balanced, introduces the core loop |
+| **Runner** | 15 | High | 8g | Fast zombie — punishes coverage gaps; tests maze routing |
+| **Brute** | 120 | Low | 20g | Hulking zombie — soaks damage; stresses single-target towers |
 
 ### Wave Composition (10 Waves)
 
 | Wave | Enemies | Notes |
 |------|---------|-------|
-| 1 | Basic ×5 | Tutorial feel — establish placement |
-| 2 | Basic ×8 | More volume |
-| 3 | Basic ×10 | First real chokepoint pressure |
-| 4 | Basic ×8 + Fast ×4 | Introduce Fast — gaps get punished |
-| 5 | Fast ×10 | Pure speed wave |
-| 6 | Basic ×6 + Fast ×6 + Tank ×1 | First Tank appearance |
-| 7 | Tank ×4 | DPS check |
-| 8 | Basic ×10 + Fast ×6 | Volume surge |
-| 9 | Tank ×4 + Fast ×8 | Combined pressure |
-| 10 | Basic ×10 + Fast ×10 + Tank ×6 | Final mixed wave |
+| 1 | Shambler ×5 | Tutorial feel — establish placement |
+| 2 | Shambler ×8 | More volume |
+| 3 | Shambler ×10 | First real chokepoint pressure |
+| 4 | Shambler ×8 + Runner ×4 | Introduce Runners — gaps get punished |
+| 5 | Runner ×10 | Pure speed wave |
+| 6 | Shambler ×6 + Runner ×6 + Brute ×1 | First Brute appearance |
+| 7 | Brute ×4 | DPS check |
+| 8 | Shambler ×10 + Runner ×6 | Volume surge |
+| 9 | Brute ×4 + Runner ×8 | Combined pressure |
+| 10 | Shambler ×10 + Runner ×10 + Brute ×6 | Final mixed wave |
 
 ---
 
@@ -94,7 +101,7 @@ Neither is "wrong" — the game rewards both. Active play offers faster skill tr
 
 ### General Behaviour
 - Placed freely on any non-occupied tile
-- Act as physical obstacles for enemy pathfinding
+- Act as physical obstacles for zombie pathfinding
 - Attack automatically — no player input required during combat
 - Can be placed mid-wave or between waves
 
@@ -102,10 +109,10 @@ Neither is "wrong" — the game rewards both. Active play offers faster skill tr
 
 | Tower | Damage | Range | Attack Speed | Cost | Role |
 |-------|--------|-------|-------------|------|------|
-| **Basic** | 10 | Medium | Medium | 50g | All-rounder starter |
-| **Sniper** | 40 | Long | Slow | 100g | Single-target DPS, long corridors |
-| **Splash** | 15 (AoE) | Short | Medium | 120g | Crowd control, clustered enemies |
-| **Slow** | 5 | Medium | Fast | 80g | Reduces enemy speed; support role |
+| **Rifle Post** | 10 | Medium | Medium | 50g | All-rounder starter — survivor with a rifle |
+| **Sniper Nest** | 40 | Long | Slow | 100g | Single-target DPS, long corridors |
+| **Molotov Pit** | 15 (AoE) | Short | Medium | 120g | Crowd control, clustered zombies |
+| **Barbed Wire** | 5 | Medium | Fast | 80g | Slows zombie movement; support role |
 
 ### Placement Rules
 - Cannot block all pathfinding routes (validated on placement attempt)
@@ -122,7 +129,7 @@ The skill tree is the **primary progression and expression system**. It should f
 - **Gold** is the single currency for both tower placement and skill tree upgrades
 - End-of-wave bonus: flat gold reward (scales with wave number)
   - Formula (draft): `bonus = 50 + (wave_number × 25)` 
-- Gold is also earned per enemy kill (see enemy table above)
+- Gold is also earned per zombie kill (see enemy table above)
 
 ### Structure
 - Each tower type has **1 skill tree** with **5 nodes**
@@ -131,44 +138,44 @@ The skill tree is the **primary progression and expression system**. It should f
 
 ### Skill Trees (Draft)
 
-#### Basic Tower
+#### Rifle Post
 ```
 [1] Faster Attack (+20% attack speed)
       ↓
 [2] Extended Range (+25% range)
       ↙         ↘
 [3a] Double Shot     [3b] Armour Pierce
-     (fires 2 proj)       (ignores 50% tank HP)
+     (fires 2 proj)       (ignores 50% Brute HP)
       ↓                    ↓
 [4a] Overcharge          [4b] Ricochet
      (every 5th shot      (shots bounce to
-      deals 3x damage)     nearest enemy)
+      deals 3x damage)     nearest zombie)
 ```
 
-#### Sniper Tower
+#### Sniper Nest
 ```
 [1] Lethal Precision (+30% damage)
       ↓
 [2] Eagle Eye (+40% range)
       ↙         ↘
 [3a] One Shot          [3b] Suppress
-     (chance to         (hit enemies move
+     (chance to         (hit zombies move
       instant-kill       30% slower for 2s)
-      Basic enemies)
+      Shamblers)
       ↓                  ↓
 [4a] Execute           [4b] Chain Suppress
      (guaranteed         (suppress spreads
-      kill <10% HP)       to nearby enemies)
+      kill <10% HP)       to nearby zombies)
 ```
 
-#### Splash Tower
+#### Molotov Pit
 ```
 [1] Bigger Blast (+30% AoE radius)
       ↓
 [2] Shrapnel (+20% damage)
       ↙         ↘
 [3a] Firebomb          [3b] Concussive
-     (AoE leaves         (AoE knocks enemies
+     (AoE leaves         (AoE knocks zombies
       fire DoT 2s)        back slightly)
       ↓                   ↓
 [4a] Napalm            [4b] Shockwave
@@ -176,18 +183,18 @@ The skill tree is the **primary progression and expression system**. It should f
                            stuns for 0.5s)
 ```
 
-#### Slow Tower
+#### Barbed Wire
 ```
-[1] Deep Freeze (+40% slow intensity)
+[1] Deep Snag (+40% slow intensity)
       ↓
-[2] Wide Chill (+35% range)
+[2] Wide Net (+35% range)
       ↙         ↘
-[3a] Ice Shatter        [3b] Frostbite
-     (frozen enemies      (slowed enemies
-      take +50% damage)    take damage over time)
+[3a] Lacerating        [3b] Infected Wound
+     (slowed zombies     (slowed zombies
+      take +50% damage)   take damage over time)
       ↓                    ↓
-[4a] Glacial Field       [4b] Blizzard
-     (AoE slow aura,       (periodic frost
+[4a] Tangle Field        [4b] Plague Pulse
+     (AoE slow aura,       (periodic slow
       affects all nearby)   pulse, wide range)
 ```
 
@@ -205,7 +212,7 @@ The skill tree is the **primary progression and expression system**. It should f
 ## 7. Base & Win/Lose
 
 - **Base HP:** 20
-- Each enemy that reaches the base deals **1 damage** (all enemy types)
+- Each zombie that reaches the base deals **1 damage** (all zombie types)
 - HP reaching 0 = **Game Over**
 - Surviving all 10 waves = **Victory**
 - No HP regeneration between waves (considered for future iteration)
@@ -217,13 +224,13 @@ The skill tree is the **primary progression and expression system**. It should f
 ```
 Title Screen
     ↓
-Map loads — base placed, empty grid
+Map loads — base placed, empty forest grid (trees pre-placed)
     ↓
 [Between-wave phase] — player places towers, spends gold on skill tree
     ↓
 Player manually starts Wave 1
     ↓
-[Wave phase] — enemies spawn + pathfind, towers auto-attack
+[Wave phase] — zombies spawn + pathfind, towers auto-attack
   - Player may place towers / upgrade mid-wave at any time
     ↓
 Wave complete → Auto-pause → Gold bonus awarded
@@ -244,7 +251,7 @@ Win or Game Over screen
 ### HUD (in-wave)
 - Gold counter (top)
 - Base HP bar (visible near base)
-- Wave number + enemy count remaining
+- Wave number + zombie count remaining
 - Tower placement panel (sidebar or bottom bar)
 
 ### Between-wave screen
@@ -263,25 +270,29 @@ Win or Game Over screen
 
 ## 10. Art Direction
 
-**Theme:** Dark fantasy post-apocalyptic — primitive humans defending against AI robots. Ironic tone.
+**Theme:** Zombie apocalypse — human survivors defending a forest encampment against waves of the undead.
 
-**World:** Cracked asphalt, rubble, ash — civilisation in ruins.
-**Humans (towers):** Scrappy, salvaged, jury-rigged. Crude but effective.
-**Robots (enemies):** Angular, cold, industrial. Rusted but relentless.
+**World:** Dense forest, green grass, overgrown wilderness. Fallen logs, clusters of mushrooms, and undergrowth fill the gaps between trees. Nature is reclaiming the world.
 
-**Palette:** Muted greys/browns (world) · warm orange/red (human fire) · cold blue-white (robot tech/EMP)
+**Survivors (towers):** Makeshift, jury-rigged, desperate. Rifle posts, fire pits, barbed wire — whatever keeps the dead out.
+
+**Zombies (enemies):** Decayed, relentless, mindless. Varying in size and speed but all converging on the living.
+
+**Palette:** Rich greens and earthy browns (world) · warm orange/yellow (fire, torchlight) · sickly grey-green (zombie flesh) · blood red (damage/death)
 
 | Element | Description |
 |---------|-------------|
-| Ground | Cracked asphalt / rubble / ash |
-| Base | Survivor camp — bonfire, scrap metal walls |
-| Enemy: Basic | Scout bot — small sensor array |
-| Enemy: Fast | Drone — lightweight, erratic |
-| Enemy: Tank | Heavy mech — armoured, slow |
-| Tower: Basic | Scrap catapult / pipe gun |
-| Tower: Sniper | Salvaged rifle on watchtower |
-| Tower: Splash | Molotov / fuel bomb launcher |
-| Tower: Slow | EMP emitter |
+| Ground | Green grass tiles — primary terrain |
+| Trees | Dense forest trees — procedural obstacles, impassable |
+| Decorations | Mushrooms, fallen logs, undergrowth — visual flavour, non-blocking |
+| Base | Survivor camp — wooden barricade, campfire, makeshift walls |
+| Enemy: Shambler | Standard zombie — ragged clothes, outstretched arms |
+| Enemy: Runner | Fast zombie — hunched, sprinting, feral |
+| Enemy: Brute | Hulking zombie — bloated, massive, slow but terrifying |
+| Tower: Rifle Post | Wooden watchtower with armed survivor |
+| Tower: Sniper Nest | Elevated platform, scoped rifle, camouflage netting |
+| Tower: Molotov Pit | Burning barrel / thrown fire bombs |
+| Tower: Barbed Wire | Coiled wire fence — slows anything that tries to pass |
 
 ---
 
@@ -290,14 +301,16 @@ Win or Game Over screen
 - **Pathfinding:** Godot's `NavigationRegion2D` or custom A* via `AStar2D`
   - Recommend `AStar2D` for tile-grid maps — gives direct control over blocked tiles
   - On tower placement: update A* grid, validate path still exists before confirming placement
-- **Tower targeting:** each tower queries nearest enemy in range each attack tick
-- **Autoloads:** `GameManager`, `WaveManager`, `EconomyManager`, `SkillTreeManager`
+  - Trees are treated as static obstacles (same as prior rocks) — AStar2D points disabled at their positions
+- **Tower targeting:** each tower queries nearest zombie in range each attack tick
+- **Autoloads:** `GameManager`, `WaveManager`, `EconomyManager`, `SkillTreeManager`, `TerrainManager`
 - **Tile grid:** `TileMap` node, single layer, 16x16 tiles
 - **Wave spawning:** WaveManager reads wave data from a resource/config file (data-driven)
+- **Map dimensions:** 71×33 grid, 16px tiles, Camera2D centred at (568, 314) — confirmed in engine
 
 ---
 
-## 11. Out of Scope (v1.0 Prototype)
+## 12. Out of Scope (v1.0 Prototype)
 
 - Multiple maps
 - Flying enemies
@@ -309,14 +322,15 @@ Win or Game Over screen
 
 ---
 
-## 12. Decisions Log
+## 13. Decisions Log
 
 | # | Decision | Notes |
 |---|----------|-------|
-| 1 | Map size: **32x32 tiles** | Open to iteration — Edward wants to feel it in-engine before locking |
-| 2 | Base position: **Centre** | 4-directional enemy pressure; harder, more interesting |
+| 1 | Map size: **32x32 tiles** (expanded to 71×33 in engine) | Confirmed in engine — wider feel preferred |
+| 2 | Base position: **Centre** | 4-directional zombie pressure; harder, more interesting |
 | 3 | Skill tree depth: **4 nodes per tree** for prototype | Branching at node 2, two paths of 2 nodes each. Expandable later |
-| 4 | Starting gold: **100g** | Clean round number; enough for 2 Basic towers before wave 1 |
+| 4 | Starting gold: **100g** | Clean round number; enough for 2 Rifle Posts before wave 1 |
+| 5 | Theme: **Zombie apocalypse / forest** | Pivoted from dark sci-fi (humans vs AI robots) — better asset availability. Rocks → trees, robots → zombies |
 
 ---
 
