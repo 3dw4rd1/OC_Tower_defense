@@ -67,7 +67,13 @@ func end_wave() -> void:
 
 
 func _on_draft_complete() -> void:
-	if state == GameState.CARD_DRAFT:
+	if state != GameState.CARD_DRAFT:
+		return
+	# Step 8: horde curse grants an extra card pick — chain another draft before completing
+	if CardManager._extra_picks_remaining > 0:
+		CardManager._extra_picks_remaining -= 1
+		CardManager.start_draft()
+	else:
 		_set_state(GameState.WAVE_COMPLETE)
 
 

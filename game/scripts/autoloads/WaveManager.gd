@@ -86,6 +86,11 @@ func _start_plan_a_wave(wave_num: int) -> void:
 	_plan_a_wave = true
 	var idx: int = wave_num - 1
 	var total_count: int = PLAN_A_COUNTS[idx]
+	# Step 8: horde surge curse — 40% more enemies this wave
+	if CardManager.next_wave_horde:
+		total_count = int(ceil(total_count * 1.4))
+		CardManager.next_wave_horde = false
+		print("WaveManager: horde surge active — spawning %d enemies this wave" % total_count)
 	_current_wave_hp = PLAN_A_HP[idx]
 	_current_wave_speed_mult = PLAN_A_SPEED_MULT[idx]
 	# Spawn interval: 1.2 s at wave 1, 0.45 s at wave 10, linear interpolation
@@ -113,10 +118,19 @@ func _start_plan_a_wave(wave_num: int) -> void:
 func _start_legacy_wave(wave_num: int) -> void:
 	var legacy_idx: int = wave_num - 11
 	var data: Dictionary = LEGACY_WAVE_DATA[legacy_idx]
+	# Step 8: horde surge curse — 40% more enemies this wave
+	var horde_active: bool = CardManager.next_wave_horde
+	if horde_active:
+		CardManager.next_wave_horde = false
 	var enemy_list: Array[String] = []
 	for enemy_type: String in data:
-		for _i: int in range(data[enemy_type]):
+		var count: int = data[enemy_type]
+		if horde_active:
+			count = int(ceil(count * 1.4))
+		for _i: int in range(count):
 			enemy_list.append(enemy_type)
+	if horde_active:
+		print("WaveManager: horde surge active — spawning %d enemies this wave" % enemy_list.size())
 	enemy_list.shuffle()
 	_build_spawn_queue(enemy_list, 0.5, false)
 

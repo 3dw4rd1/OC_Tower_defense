@@ -35,7 +35,10 @@ func _physics_process(delta: float) -> void:
 		_path_index += 1
 		return
 
-	velocity = (target - global_position).normalized() * speed * _speed_multiplier
+	# Slow tile terrain check (Step 7): tiles placed by Dead Ground card slow to 70%
+	var my_tile: Vector2i = PathfindingManager.world_to_tile(global_position)
+	var terrain_mult: float = 0.7 if TerrainManager.is_slow_tile(my_tile) else 1.0
+	velocity = (target - global_position).normalized() * speed * _speed_multiplier * terrain_mult
 	move_and_slide()
 
 

@@ -25,7 +25,22 @@ var rare_weight_bonus: float = 0.0
 # Card pool loaded from JSON: rarity string -> Array of card dicts
 var _card_pool: Dictionary = {}
 
+# ── Curse / economy card state ─────────────────────────────────────────────────
+
+# tower_cost_reduction: multiplier applied to all TOWER_COSTS (starts at 1.0 = no discount)
+var card_cost_multiplier: float = 1.0
+
+# curse_temp_damage_penalty: towers deal (1 - curse_damage_penalty) × damage
+var curse_damage_penalty: float = 0.0
+var curse_damage_waves_remaining: int = 0
+
+# curse_next_wave_horde: WaveManager reads this flag at wave start; registry sets it
+var next_wave_horde: bool = false
+
+# Draft flow: set by curse_next_wave_horde so the post-horde wave draws 2 cards
 var _curse_next_wave_double_draw: bool = false
+# Tracks how many extra picks remain in the current draft session
+var _extra_picks_remaining: int = 0
 
 var _effect_registry: RefCounted = null
 
@@ -33,6 +48,7 @@ var _effect_registry: RefCounted = null
 func _ready() -> void:
 	_effect_registry = load("res://scripts/cards/card_effect_registry.gd").new()
 	_load_card_pool()
+	WaveManager.wave_started.connect(_on_wave_started)
 
 
 func _load_card_pool() -> void:
@@ -63,7 +79,11 @@ func _load_card_pool() -> void:
 
 # Called by GameManager when a wave ends.
 # Emits card_draft_started — CardDraftScreen handles the rest.
+# If _curse_next_wave_double_draw was set, queues one extra pick after the first.
 func start_draft() -> void:
+	if _curse_next_wave_double_draw:
+		_curse_next_wave_double_draw = false
+		_extra_picks_remaining = 1
 	var cards: Array = draw_cards(3)
 	card_draft_started.emit(cards)
 
@@ -96,7 +116,7 @@ func _pick_rarity() -> String:
 	var w_common: float    = 0.60
 	var w_uncommon: float  = 0.28
 	var w_rare: float      = 0.10 + rare_weight_bonus
-	var w_legendary: float = 0.02 + rare_weight_bonus
+	var w_legendary: float = 0.02 + rare_weight_bonus * 0.5
 	var total: float = w_common + w_uncommon + w_rare + w_legendary
 	var roll: float = randf() * total
 	if roll < w_common:
@@ -197,7 +217,24 @@ func has_effect(effect_id: String) -> bool:
 	return active_effects.has(effect_id)
 
 
+# Returns all slow tile positions — enemies check this for 70% speed terrain.
+# Source of truth lives in TerrainManager.slow_tiles.
+func get_slow_tiles() -> Array:
+	return TerrainManager.slow_tiles.keys()
+
+
 # Internal: accumulate a tower stat multiplier bonus (called by card_effect_registry)
 func _add_tower_multiplier(tower_type: String, stat: String, value: float) -> void:
 	if _tower_multipliers.has(tower_type):
 		_tower_multipliers[tower_type][stat] = _tower_multipliers[tower_type].get(stat, 0.0) + value
+
+
+# Called at the start of each wave — decrement curse timers and notify towers if anything expired.
+func _on_wave_started(_wave_num: int) -> void:
+	if curse_damage_waves_remaining > 0:
+		curse_damage_waves_remaining -= 1
+		if curse_damage_waves_remaining <= 0:
+			curse_damage_penalty = 0.0
+			print("CardManager: damage curse expired — towers back to full damage")
+			# Re-trigger stat recalculation on all placed towers
+			card_picked.emit({})

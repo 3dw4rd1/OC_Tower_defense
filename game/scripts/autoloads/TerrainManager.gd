@@ -13,8 +13,10 @@ const OBSTACLE_THRESHOLD: float = 0.17  # Perlin values above this become obstac
 const BASE_CLEAR_RADIUS: int = 5
 
 var obstacle_tiles: Dictionary = {}
+var slow_tiles: Dictionary = {}          # cell → true for tiles that slow enemies to 70%
 var _game_map: Node = null
 var _obstacles_container: Node2D = null
+var _obstacle_nodes: Dictionary = {}     # cell → StaticBody2D, for runtime removal
 
 
 func initialise(game_map: Node, obstacles_container: Node2D) -> void:
@@ -29,15 +31,108 @@ func is_obstacle(cell: Vector2i) -> bool:
 	return obstacle_tiles.has(cell)
 
 
-# Removes an obstacle tile at runtime — stub ready for future mechanics (e.g. bulldozing)
+func is_slow_tile(cell: Vector2i) -> bool:
+	return slow_tiles.has(cell)
+
+
+# Removes an obstacle tile at runtime, including its visual node.
 func clear_obstacle_tile(cell: Vector2i) -> void:
 	if not obstacle_tiles.has(cell):
 		return
 	obstacle_tiles.erase(cell)
 	PathfindingManager.remove_obstacle(cell)
+	if _obstacle_nodes.has(cell):
+		_obstacle_nodes[cell].queue_free()
+		_obstacle_nodes.erase(cell)
+
+
+# Removes `count` random obstacle tiles from the map.
+func remove_random_obstacles(count: int) -> void:
+	var cells: Array = obstacle_tiles.keys()
+	cells.shuffle()
+	var removed: int = 0
+	for cell: Vector2i in cells:
+		if removed >= count:
+			break
+		clear_obstacle_tile(cell)
+		removed += 1
+		print("[TerrainManager] removed obstacle at %s" % str(cell))
+	print("[TerrainManager] remove_obstacles: cleared %d/%d obstacles" % [removed, count])
+
+
+# Spawns `count` new obstacle tiles in random open positions, then validates paths.
+func spawn_random_obstacles(count: int) -> void:
+	var placed: int = 0
+	var attempts: int = 0
+	while placed < count and attempts < count * 30:
+		attempts += 1
+		var x: int = randi_range(EDGE_BUFFER, GRID_COLS - EDGE_BUFFER - 1)
+		var y: int = randi_range(EDGE_BUFFER, GRID_ROWS - EDGE_BUFFER - 1)
+		var cell := Vector2i(x, y)
+		# Skip base clear zone, existing obstacles, and tiles blocked by towers
+		if absi(x - BASE_TILE.x) <= BASE_CLEAR_RADIUS and absi(y - BASE_TILE.y) <= BASE_CLEAR_RADIUS:
+			continue
+		if obstacle_tiles.has(cell) or PathfindingManager.is_point_disabled(cell):
+			continue
+		# Test — place temporarily and validate at least one edge→base path remains
+		obstacle_tiles[cell] = true
+		PathfindingManager.place_obstacle(cell)
+		if not _check_any_path_to_base():
+			obstacle_tiles.erase(cell)
+			PathfindingManager.remove_obstacle(cell)
+			continue
+		_spawn_obstacle(cell)
+		placed += 1
+		print("[TerrainManager] spawned obstacle at %s" % str(cell))
+	print("[TerrainManager] spawn_obstacles: placed %d/%d obstacles" % [placed, count])
+
+
+# Places a slow tile at `cell` — paints a brown visual, records in slow_tiles dict.
+func place_slow_tile(cell: Vector2i) -> void:
+	if slow_tiles.has(cell):
+		return
+	slow_tiles[cell] = true
+	if _obstacles_container:
+		var world_pos: Vector2 = PathfindingManager.tile_to_world(cell)
+		var rect := ColorRect.new()
+		rect.color = Color(0.45, 0.28, 0.08, 0.70)  # muddy brown, semi-transparent
+		rect.size = Vector2(16, 16)
+		rect.position = world_pos - Vector2(8.0, 8.0)
+		_obstacles_container.add_child(rect)
+	print("[TerrainManager] placed slow tile at %s" % str(cell))
+
+
+# Finds a random open walkable tile and places a slow tile there.
+func spawn_random_slow_tile() -> void:
+	var attempts: int = 0
+	while attempts < 300:
+		attempts += 1
+		var x: int = randi_range(EDGE_BUFFER, GRID_COLS - EDGE_BUFFER - 1)
+		var y: int = randi_range(EDGE_BUFFER, GRID_ROWS - EDGE_BUFFER - 1)
+		var cell := Vector2i(x, y)
+		if obstacle_tiles.has(cell) or PathfindingManager.is_point_disabled(cell):
+			continue
+		if slow_tiles.has(cell):
+			continue
+		place_slow_tile(cell)
+		return
+	push_warning("TerrainManager: could not find a valid cell for slow tile after 300 attempts")
 
 
 # ─── Private ──────────────────────────────────────────────────────────────────
+
+func _check_any_path_to_base() -> bool:
+	var edge_samples: Array[Vector2i] = [
+		Vector2i(GRID_COLS / 2, 0),
+		Vector2i(GRID_COLS / 2, GRID_ROWS - 1),
+		Vector2i(0, GRID_ROWS / 2),
+		Vector2i(GRID_COLS - 1, GRID_ROWS / 2),
+	]
+	for sample: Vector2i in edge_samples:
+		if PathfindingManager.has_valid_path(sample, BASE_TILE):
+			return true
+	return false
+
 
 func _generate_obstacles() -> void:
 	var noise := FastNoiseLite.new()
@@ -146,3 +241,4 @@ func _spawn_obstacle(cell: Vector2i) -> void:
 	body.add_child(collision)
 
 	_obstacles_container.add_child(body)
+	_obstacle_nodes[cell] = body

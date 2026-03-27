@@ -106,6 +106,11 @@ func _get_all_collision_shapes(node: Node) -> Array:
 	return result
 
 
+func _get_effective_cost(tower_type: String) -> int:
+	var base: int = TOWER_COSTS.get(tower_type, 0) as int
+	return int(floor(base * CardManager.card_cost_multiplier))
+
+
 func _is_tile_valid(tile_pos: Vector2i) -> bool:
 	if tile_pos.x < 0 or tile_pos.x >= GRID_COLS or tile_pos.y < 0 or tile_pos.y >= GRID_ROWS:
 		return false
@@ -117,8 +122,7 @@ func _is_tile_valid(tile_pos: Vector2i) -> bool:
 		return false
 	if selected_tower_type == "wall" and _wall_count >= MAX_WALL_TOWERS:
 		return false
-	var cost: int = TOWER_COSTS.get(selected_tower_type, 0) as int
-	if GameManager.gold < cost:
+	if GameManager.gold < _get_effective_cost(selected_tower_type):
 		return false
 	return true
 
@@ -186,7 +190,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	# Confirm placement and spawn tower scene
-	var cost: int = TOWER_COSTS.get(selected_tower_type, 0) as int
+	var cost: int = _get_effective_cost(selected_tower_type)
 	var scene_path: String = TOWER_SCENES.get(selected_tower_type, "") as String
 	if not scene_path.is_empty() and ResourceLoader.exists(scene_path):
 		GameManager.spend_gold(cost)

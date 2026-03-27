@@ -51,6 +51,9 @@ func _apply_card_modifiers() -> void:
 	damage = int(_base_damage * mods.get("damage", 1.0))
 	range_px = _base_range_px * mods.get("range", 1.0)
 	attack_speed = _base_attack_speed * mods.get("attack_speed", 1.0)
+	# Apply curse damage penalty on top of normal multipliers (Step 8)
+	if CardManager.curse_damage_penalty > 0.0:
+		damage = int(damage * (1.0 - CardManager.curse_damage_penalty))
 
 
 func _on_card_picked(_card: Dictionary) -> void:
