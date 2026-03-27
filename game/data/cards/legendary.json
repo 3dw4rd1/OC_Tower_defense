@@ -86,6 +86,7 @@
     "flavor_text": "Every inch of that clearing is a death sentence.",
     "rarity": "legendary",
     "tower_affinity": "sniper",
+    "requires_tower_types": ["sniper", "splash"],
     "effect": "synergy_killbox",
     "effect_params": { "bonus": 0.60, "duration": 3.0 }
   }

@@ -10,6 +10,10 @@ var _path: Array[Vector2] = []
 var _path_index: int = 0
 var _speed_multiplier: float = 1.0
 var _slow_timer: float = 0.0
+var _is_frozen: bool = false
+var _freeze_timer: float = 0.0
+var _in_killbox: bool = false
+var _killbox_timer: float = 0.0
 
 var BASE_TILE: Vector2i = PathfindingManager.BASE_TILE
 
@@ -19,6 +23,21 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# Freeze overrides all movement
+	if _is_frozen:
+		_freeze_timer -= delta
+		if _freeze_timer <= 0.0:
+			_is_frozen = false
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
+
+	# Killbox timer — clear flag when expired
+	if _in_killbox:
+		_killbox_timer -= delta
+		if _killbox_timer <= 0.0:
+			_in_killbox = false
+
 	if _slow_timer > 0.0:
 		_slow_timer -= delta
 		if _slow_timer <= 0.0:
@@ -51,6 +70,16 @@ func take_damage(amount: int) -> void:
 func apply_slow(factor: float, duration: float) -> void:
 	_speed_multiplier = 1.0 - factor
 	_slow_timer = duration
+
+
+func freeze(duration: float) -> void:
+	_is_frozen = true
+	_freeze_timer = duration
+
+
+func apply_killbox(duration: float) -> void:
+	_in_killbox = true
+	_killbox_timer = duration
 
 
 func reach_base() -> void:

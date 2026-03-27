@@ -141,6 +141,7 @@ func _spawn_projectile(target: Node2D) -> void:
 	proj.color = projectile_color
 	proj.aoe_radius = projectile_aoe_radius
 	proj.slow_duration = projectile_slow_duration
+	proj.tower_type = _tower_type
 	proj.global_position = global_position
 	get_parent().add_child(proj)
 

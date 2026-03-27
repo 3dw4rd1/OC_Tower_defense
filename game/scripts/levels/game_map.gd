@@ -198,6 +198,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var packed: PackedScene = load(scene_path)
 		var tower: Node2D = packed.instantiate() as Node2D
 		tower.position = PathfindingManager.tile_to_world(tile_pos)
+		tower.add_to_group("towers")
 		if _towers_container:
 			_towers_container.add_child(tower)
 		else:

@@ -130,21 +130,41 @@ func _pick_rarity() -> String:
 	return "legendary"
 
 
+# Returns all distinct tower types currently placed on the map.
+func _get_placed_tower_types() -> Array:
+	var placed := []
+	for tower in get_tree().get_nodes_in_group("towers"):
+		var t = tower.get("_tower_type")
+		if t and t not in placed:
+			placed.append(t)
+	return placed
+
+
 # Returns cards eligible to be drawn for a given rarity.
 # Rare/Legendary cards are locked behind specialisation thresholds per tower type.
+# Synergy cards with requires_tower_types are only available when those towers are placed.
 func _get_available_pool(rarity: String) -> Array:
 	var all_cards: Array = _card_pool.get(rarity, [])
-	if rarity != "rare" and rarity != "legendary":
-		return all_cards
-	var threshold: int = 3 if rarity == "rare" else 6
+	var placed_types: Array = _get_placed_tower_types()
 	var available: Array = []
 	for card: Dictionary in all_cards:
-		var affinity = card.get("tower_affinity", null)
-		if affinity == null:
-			# Economy/map cards have no affinity — always available
-			available.append(card)
-		elif specialisation.get(affinity, 0) >= threshold:
-			available.append(card)
+		# Specialisation threshold for rare/legendary (economy/map cards with null affinity always pass)
+		if rarity == "rare" or rarity == "legendary":
+			var threshold: int = 3 if rarity == "rare" else 6
+			var affinity = card.get("tower_affinity", null)
+			if affinity != null and specialisation.get(affinity, 0) < threshold:
+				continue
+		# Tower placement requirement for synergy cards
+		var required_types = card.get("requires_tower_types", null)
+		if required_types != null:
+			var all_present: bool = true
+			for rt in required_types:
+				if not placed_types.has(rt):
+					all_present = false
+					break
+			if not all_present:
+				continue
+		available.append(card)
 	return available
 
 

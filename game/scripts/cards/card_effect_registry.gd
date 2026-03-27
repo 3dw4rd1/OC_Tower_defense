@@ -66,6 +66,14 @@ func apply(effect: String, params: Dictionary, card_manager: Node) -> void:
 			print("  → [card effect] spawn_slow_tile: placing difficult terrain tile")
 			TerrainManager.spawn_random_slow_tile()
 
+		# ── Heal base (Step 9) ────────────────────────────────────────────────
+		"heal_base":
+			var amount: int = int(params.get("amount", 0))
+			var old_hp: int = GameManager.base_hp
+			GameManager.heal_base(amount)
+			var healed: int = GameManager.base_hp - old_hp
+			print("  → [card effect] heal_base: restored %dhp (now: %d/%d)" % [healed, GameManager.base_hp, GameManager.MAX_BASE_HP])
+
 		# ── Curse effects (Step 8) ─────────────────────────────────────────────
 		"curse_next_wave_horde":
 			card_manager.next_wave_horde = true
@@ -87,15 +95,27 @@ func apply(effect: String, params: Dictionary, card_manager: Node) -> void:
 
 		# ── Synergy flags (Step 9) ────────────────────────────────────────────
 		"synergy_slow_sniper_bonus":
+			var bonus: float = params.get("bonus", 0.0)
 			card_manager.active_effects["synergy_slow_sniper_bonus"] = \
-				card_manager.active_effects.get("synergy_slow_sniper_bonus", 0.0) + params.get("bonus", 0.0)
+				card_manager.active_effects.get("synergy_slow_sniper_bonus", 0.0) + bonus
+			print("  → [card effect] synergy_slow_sniper_bonus: sniper +%.0f%% vs slowed enemies (total: %.0f%%)" % [
+				bonus * 100, card_manager.active_effects["synergy_slow_sniper_bonus"] * 100])
 		"synergy_slow_all_bonus":
+			var bonus: float = params.get("bonus", 0.0)
 			card_manager.active_effects["synergy_slow_all_bonus"] = \
-				card_manager.active_effects.get("synergy_slow_all_bonus", 0.0) + params.get("bonus", 0.0)
+				card_manager.active_effects.get("synergy_slow_all_bonus", 0.0) + bonus
+			print("  → [card effect] synergy_slow_all_bonus: all towers +%.0f%% vs slowed enemies (total: %.0f%%)" % [
+				bonus * 100, card_manager.active_effects["synergy_slow_all_bonus"] * 100])
 		"synergy_frost_fire":
 			card_manager.active_effects["synergy_frost_fire"] = true
+			card_manager.active_effects["synergy_frost_fire_duration"] = params.get("freeze_duration", 0.5)
+			print("  → [card effect] synergy_frost_fire: slowed enemies frozen on AoE hit (%.1fs)" % params.get("freeze_duration", 0.5))
 		"synergy_killbox":
 			card_manager.active_effects["synergy_killbox"] = true
+			card_manager.active_effects["synergy_killbox_bonus"] = params.get("bonus", 0.60)
+			card_manager.active_effects["synergy_killbox_duration"] = params.get("duration", 3.0)
+			print("  → [card effect] synergy_killbox: sniper +%.0f%% vs enemies in blast radius (%.1fs window)" % [
+				params.get("bonus", 0.60) * 100, params.get("duration", 3.0)])
 
 		# ── Rifle mechanics (Step 10) ─────────────────────────────────────────
 		"rifle_kill_chain", "rifle_overcharge", "rifle_ricochet", "rifle_double_tap":

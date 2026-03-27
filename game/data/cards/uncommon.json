@@ -56,6 +56,7 @@
     "flavor_text": "Pin them down. Let the marksman finish it.",
     "rarity": "uncommon",
     "tower_affinity": "sniper",
+    "requires_tower_types": ["slow", "sniper"],
     "effect": "synergy_slow_sniper_bonus",
     "effect_params": { "bonus": 0.30 }
   },
@@ -128,5 +129,15 @@
     "tower_affinity": null,
     "effect": "curse_temp_damage_penalty",
     "effect_params": { "penalty": 0.20, "waves": 2, "gold_reward": 150 }
+  },
+  {
+    "id": "heal_base_10",
+    "name": "Medical Supply Drop",
+    "description": "Restore 10 base HP.",
+    "flavor_text": "Someone called for backup.",
+    "rarity": "uncommon",
+    "tower_affinity": null,
+    "effect": "heal_base",
+    "effect_params": { "amount": 10 }
   }
 ]

@@ -86,6 +86,7 @@
     "flavor_text": "Cold slows. Fire finishes.",
     "rarity": "rare",
     "tower_affinity": "splash",
+    "requires_tower_types": ["slow", "splash"],
     "effect": "synergy_frost_fire",
     "effect_params": { "freeze_duration": 0.5 }
   },
@@ -128,5 +129,15 @@
     "tower_affinity": null,
     "effect": "curse_remove_affinity",
     "effect_params": { "boost": 0.30 }
+  },
+  {
+    "id": "heal_base_20",
+    "name": "Miracle Rally",
+    "description": "Restore 20 base HP.",
+    "flavor_text": "Against all odds, they held the line.",
+    "rarity": "rare",
+    "tower_affinity": null,
+    "effect": "heal_base",
+    "effect_params": { "amount": 20 }
   }
 ]

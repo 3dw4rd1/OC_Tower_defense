@@ -98,5 +98,15 @@
     "tower_affinity": null,
     "effect": "kill_gold_flat",
     "effect_params": { "amount": 2 }
+  },
+  {
+    "id": "heal_base_5",
+    "name": "Field Medic",
+    "description": "Restore 5 base HP.",
+    "flavor_text": "Every survivor counts.",
+    "rarity": "common",
+    "tower_affinity": null,
+    "effect": "heal_base",
+    "effect_params": { "amount": 5 }
   }
 ]

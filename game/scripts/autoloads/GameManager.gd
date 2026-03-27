@@ -16,10 +16,11 @@ signal game_over
 signal victory
 
 const TOTAL_WAVES: int = 25
+const MAX_BASE_HP: int = 50
 
 var state: GameState = GameState.SETUP
 var current_wave: int = 0
-var base_hp: int = 50
+var base_hp: int = MAX_BASE_HP
 var gold: int = 1000
 
 
@@ -38,6 +39,11 @@ func spend_gold(amount: int) -> bool:
 	gold -= amount
 	gold_changed.emit(gold)
 	return true
+
+
+func heal_base(amount: int) -> void:
+	base_hp = min(MAX_BASE_HP, base_hp + amount)
+	base_hp_changed.emit(base_hp)
 
 
 func damage_base(amount: int) -> void:
