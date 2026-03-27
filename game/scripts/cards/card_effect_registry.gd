@@ -11,16 +11,19 @@ func apply(effect: String, params: Dictionary, card_manager: Node) -> void:
 			var tower_type: String = params.get("tower_type", "")
 			var mult: float = params.get("multiplier", 0.0)
 			card_manager._add_tower_multiplier(tower_type, "attack_speed", mult)
+			print("  → [card effect] %s attack_speed +%.0f%% (total: %.0f%%)" % [tower_type, mult * 100, (1.0 + card_manager._tower_multipliers[tower_type]["attack_speed"]) * 100])
 
 		"tower_damage":
 			var tower_type: String = params.get("tower_type", "")
 			var mult: float = params.get("multiplier", 0.0)
 			card_manager._add_tower_multiplier(tower_type, "damage", mult)
+			print("  → [card effect] %s damage +%.0f%% (total: %.0f%%)" % [tower_type, mult * 100, (1.0 + card_manager._tower_multipliers[tower_type]["damage"]) * 100])
 
 		"tower_range":
 			var tower_type: String = params.get("tower_type", "")
 			var mult: float = params.get("multiplier", 0.0)
 			card_manager._add_tower_multiplier(tower_type, "range", mult)
+			print("  → [card effect] %s range +%.0f%% (total: %.0f%%)" % [tower_type, mult * 100, (1.0 + card_manager._tower_multipliers[tower_type]["range"]) * 100])
 
 		# --- Meta ---
 		"rare_weight_boost":
