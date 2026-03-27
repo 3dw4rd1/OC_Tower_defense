@@ -24,8 +24,7 @@ var gold: int = 1000
 
 
 func _ready() -> void:
-	# Transition out of CARD_DRAFT when a card is picked
-	CardManager.card_picked.connect(_on_card_picked)
+	pass
 
 
 func add_gold(amount: int) -> void:
@@ -67,7 +66,7 @@ func end_wave() -> void:
 		CardManager.start_draft()
 
 
-func _on_card_picked(_card: Dictionary) -> void:
+func _on_draft_complete() -> void:
 	if state == GameState.CARD_DRAFT:
 		_set_state(GameState.WAVE_COMPLETE)
 

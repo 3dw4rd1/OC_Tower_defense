@@ -1,4 +1,4 @@
-extends Node
+extends RefCounted
 # Plain script — not an autoload. Instantiated and owned by CardManager.
 # Only tower_attack_speed, tower_damage, and tower_range are fully implemented (Steps 1-5).
 # All other effect IDs are stubs that will be filled in later steps.

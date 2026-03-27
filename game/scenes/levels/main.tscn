@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bmain001"]
+[gd_scene load_steps=6 format=3 uid="uid://bmain001"]
 
 [ext_resource type="Script" path="res://scripts/levels/main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://bgamemap001" path="res://scenes/levels/GameMap.tscn" id="2_gamemap"]
 [ext_resource type="PackedScene" uid="uid://bbase001" path="res://scenes/levels/Base.tscn" id="3_base"]
 [ext_resource type="PackedScene" uid="uid://bhud001" path="res://scenes/ui/hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" uid="uid://bcarddraft01" path="res://scenes/ui/card_draft_screen.tscn" id="5_carddraft"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -24,3 +25,5 @@ position = Vector2(648, 328)
 position = Vector2(640, 328)
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="CardDraftScreen" parent="." instance=ExtResource("5_carddraft")]

@@ -1,0 +1,63 @@
+[gd_scene load_steps=2 format=3 uid="uid://bcardpanel001"]
+
+[ext_resource type="Script" path="res://scripts/ui/card_panel.gd" id="1_cpanel"]
+
+[node name="CardPanel" type="Control"]
+custom_minimum_size = Vector2(180, 260)
+script = ExtResource("1_cpanel")
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.533, 0.533, 0.533, 1.0)
+mouse_filter = 2
+
+[node name="HoverHighlight" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(1, 1, 1, 0.12)
+mouse_filter = 2
+visible = false
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer"]
+theme_override_constants/separation = 6
+mouse_filter = 2
+
+[node name="NameLabel" type="Label" parent="MarginContainer/VBox"]
+theme_override_font_sizes/font_size = 15
+text = "Card Name"
+mouse_filter = 2
+
+[node name="RarityLabel" type="Label" parent="MarginContainer/VBox"]
+theme_override_font_sizes/font_size = 11
+text = "Common"
+mouse_filter = 2
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBox"]
+mouse_filter = 2
+
+[node name="DescriptionLabel" type="Label" parent="MarginContainer/VBox"]
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+text = "Description text."
+mouse_filter = 2
+
+[node name="FlavorLabel" type="Label" parent="MarginContainer/VBox"]
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1.0)
+autowrap_mode = 3
+text = "Flavor text."
+mouse_filter = 2
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

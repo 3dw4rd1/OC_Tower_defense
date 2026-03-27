@@ -27,7 +27,7 @@ var _card_pool: Dictionary = {}
 
 var _curse_next_wave_double_draw: bool = false
 
-var _effect_registry: Node = null
+var _effect_registry: RefCounted = null
 
 
 func _ready() -> void:
@@ -61,15 +61,11 @@ func _load_card_pool() -> void:
 	])
 
 
-# Called by GameManager when a wave ends (Step 4)
+# Called by GameManager when a wave ends.
+# Emits card_draft_started — CardDraftScreen handles the rest.
 func start_draft() -> void:
 	var cards: Array = draw_cards(3)
 	card_draft_started.emit(cards)
-	# Step 4 placeholder: auto-pick first card. Remove this block in Step 6 when UI is wired.
-	if cards.size() > 0:
-		var auto_id: String = cards[0]["id"]
-		print("CardManager [placeholder]: auto-picking '%s'" % auto_id)
-		pick_card(auto_id)
 
 
 # Weighted random draw of `count` unique cards.
