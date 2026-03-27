@@ -30,7 +30,8 @@ func _on_hit() -> void:
 	if is_instance_valid(target):
 		hit_pos = target.global_position
 		var actual_damage: int = damage
-		var target_slowed: bool = target.get("_slow_timer", 0.0) > 0.0
+		var slow_val = target.get("_slow_timer")
+		var target_slowed: bool = slow_val != null and float(slow_val) > 0.0
 
 		# synergy_slow_sniper_bonus: sniper hits slowed enemy → bonus damage
 		if tower_type == "sniper" and target_slowed and CardManager.has_effect("synergy_slow_sniper_bonus"):
@@ -92,7 +93,8 @@ func _apply_aoe_synergies(enemies: Array) -> void:
 		if not is_instance_valid(enemy):
 			continue
 		# synergy_frost_fire: slowed enemy hit by AoE → freeze
-		if CardManager.has_effect("synergy_frost_fire") and enemy.get("_slow_timer", 0.0) > 0.0:
+		var enemy_slow_val = enemy.get("_slow_timer")
+		if CardManager.has_effect("synergy_frost_fire") and enemy_slow_val != null and float(enemy_slow_val) > 0.0:
 			if enemy.has_method("freeze"):
 				var fdur: float = CardManager.active_effects.get("synergy_frost_fire_duration", 0.5)
 				enemy.freeze(fdur)
