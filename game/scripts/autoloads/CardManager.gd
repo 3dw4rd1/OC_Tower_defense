@@ -46,7 +46,7 @@ func _load_card_pool() -> void:
 			continue
 		var json_text: String = file.get_as_text()
 		file.close()
-		var result := JSON.parse_string(json_text)
+		var result: Variant = JSON.parse_string(json_text)
 		if result == null or not result is Array:
 			push_error("CardManager: failed to parse %s" % path)
 			_card_pool[rarity] = []
