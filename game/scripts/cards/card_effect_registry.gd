@@ -31,9 +31,17 @@ func apply(effect: String, params: Dictionary, card_manager: Node) -> void:
 			card_manager.rare_weight_bonus += 0.08
 			print("  → [card effect] rare_weight_boost: bonus now %.2f" % card_manager.rare_weight_bonus)
 
-		# ── Tower stat variants (Step 5 extension — stubs) ────────────────────
-		"tower_aoe_radius", "tower_slow_intensity":
-			pass  # TODO Step 5 extension
+		# ── Tower stat variants (Step 5 extension) ───────────────────────────
+		"tower_aoe_radius":
+			var tower_type: String = params.get("tower_type", "")
+			var mult: float = params.get("multiplier", 0.0)
+			card_manager._add_tower_multiplier(tower_type, "aoe_radius", mult)
+			print("  -> [card effect] %s aoe_radius +%.0f%%" % [tower_type, mult * 100])
+		"tower_slow_intensity":
+			var tower_type: String = params.get("tower_type", "")
+			var mult: float = params.get("multiplier", 0.0)
+			card_manager._add_tower_multiplier(tower_type, "slow_intensity", mult)
+			print("  -> [card effect] %s slow_intensity +%.0f%%" % [tower_type, mult * 100])
 
 		# ── Economy effects (Step 7) ───────────────────────────────────────────
 		"wave_bonus_flat":
@@ -118,7 +126,13 @@ func apply(effect: String, params: Dictionary, card_manager: Node) -> void:
 				params.get("bonus", 0.60) * 100, params.get("duration", 3.0)])
 
 		# ── Rifle mechanics (Step 10) ─────────────────────────────────────────
-		"rifle_kill_chain", "rifle_overcharge", "rifle_ricochet", "rifle_double_tap":
+		"rifle_kill_chain":
+			card_manager.active_effects["rifle_kill_chain"] = true
+			card_manager.active_effects["rifle_kill_chain_stack"] = card_manager.active_effects.get("rifle_kill_chain_stack", 0) + 1
+			var kc_stack: int = card_manager.active_effects["rifle_kill_chain_stack"]
+			var kc_threshold: int = max(2, 10 - (kc_stack - 1) * 2)
+			print("  -> [card effect] rifle_kill_chain: stack %d (trigger at %d kills)" % [kc_stack, kc_threshold])
+		"rifle_overcharge", "rifle_ricochet", "rifle_double_tap":
 			card_manager.active_effects[effect] = true
 
 		# ── Sniper mechanics (Step 10) ────────────────────────────────────────

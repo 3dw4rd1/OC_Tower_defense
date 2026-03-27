@@ -5,6 +5,8 @@ signal died
 var speed: float = 80.0
 var damage: int = 1
 var _hp: int = 30
+var _max_hp: int = 30
+var _last_hit_tower_type: String = ""
 var _enemy_type: String = "basic"
 var _path: Array[Vector2] = []
 var _path_index: int = 0
@@ -19,6 +21,7 @@ var BASE_TILE: Vector2i = PathfindingManager.BASE_TILE
 
 
 func _ready() -> void:
+	_max_hp = _hp
 	PathfindingManager.obstacle_changed.connect(_recalculate_path)
 
 
@@ -90,8 +93,23 @@ func reach_base() -> void:
 
 func _die() -> void:
 	EconomyManager.award_kill_gold(_enemy_type, GameManager.current_wave)
+	# rifle_kill_chain: track basic tower kills; fire volley at threshold
+	if _last_hit_tower_type == "basic" and CardManager.has_effect("rifle_kill_chain"):
+		CardManager.kill_chain_counter += 1
+		var stack: int = CardManager.active_effects.get("rifle_kill_chain_stack", 1)
+		var threshold: int = max(2, 10 - (stack - 1) * 2)
+		if CardManager.kill_chain_counter >= threshold:
+			CardManager.kill_chain_counter = 0
+			_fire_basic_volley()
 	died.emit()
 	queue_free()
+
+
+func _fire_basic_volley() -> void:
+	print("[rifle_kill_chain] Kill chain triggered — all basic towers fire!")
+	for tower in get_tree().get_nodes_in_group("towers"):
+		if tower.get("_tower_type") == "basic":
+			tower.call("_do_attack")
 
 
 func _recalculate_path() -> void:

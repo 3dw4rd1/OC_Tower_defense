@@ -9,11 +9,11 @@ var specialisation: Dictionary = { "basic": 0, "sniper": 0, "splash": 0, "slow":
 # Accumulated additive multiplier bonuses per tower type per stat
 # get_tower_multipliers() returns 1.0 + these values
 var _tower_multipliers: Dictionary = {
-	"basic":  { "attack_speed": 0.0, "damage": 0.0, "range": 0.0 },
-	"sniper": { "attack_speed": 0.0, "damage": 0.0, "range": 0.0 },
-	"splash": { "attack_speed": 0.0, "damage": 0.0, "range": 0.0 },
-	"slow":   { "attack_speed": 0.0, "damage": 0.0, "range": 0.0 },
-	"wall":   { "attack_speed": 0.0, "damage": 0.0, "range": 0.0 },
+	"basic":  { "attack_speed": 0.0, "damage": 0.0, "range": 0.0, "aoe_radius": 0.0, "slow_intensity": 0.0 },
+	"sniper": { "attack_speed": 0.0, "damage": 0.0, "range": 0.0, "aoe_radius": 0.0, "slow_intensity": 0.0 },
+	"splash": { "attack_speed": 0.0, "damage": 0.0, "range": 0.0, "aoe_radius": 0.0, "slow_intensity": 0.0 },
+	"slow":   { "attack_speed": 0.0, "damage": 0.0, "range": 0.0, "aoe_radius": 0.0, "slow_intensity": 0.0 },
+	"wall":   { "attack_speed": 0.0, "damage": 0.0, "range": 0.0, "aoe_radius": 0.0, "slow_intensity": 0.0 },
 }
 
 # General active effect flags and values (for complex effects in later steps)
@@ -41,6 +41,8 @@ var next_wave_horde: bool = false
 var _curse_next_wave_double_draw: bool = false
 # Tracks how many extra picks remain in the current draft session
 var _extra_picks_remaining: int = 0
+
+var kill_chain_counter: int = 0
 
 var _effect_registry: RefCounted = null
 
@@ -226,9 +228,11 @@ func pick_card(card_id: String) -> void:
 func get_tower_multipliers(tower_type: String) -> Dictionary:
 	var base: Dictionary = _tower_multipliers.get(tower_type, {})
 	return {
-		"attack_speed": 1.0 + base.get("attack_speed", 0.0),
-		"damage":       1.0 + base.get("damage", 0.0),
-		"range":        1.0 + base.get("range", 0.0),
+		"attack_speed":   1.0 + base.get("attack_speed", 0.0),
+		"damage":         1.0 + base.get("damage", 0.0),
+		"range":          1.0 + base.get("range", 0.0),
+		"aoe_radius":     1.0 + base.get("aoe_radius", 0.0),
+		"slow_intensity": 1.0 + base.get("slow_intensity", 0.0),
 	}
 
 

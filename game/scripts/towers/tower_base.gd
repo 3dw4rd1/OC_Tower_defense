@@ -19,6 +19,8 @@ var _tower_type: String = ""
 var _base_damage: int = 0
 var _base_range_px: float = 0.0
 var _base_attack_speed: float = 0.0
+var _base_aoe_radius: float = 0.0
+var _base_slow_duration: float = 0.0
 
 var _attack_timer: float = 0.0
 var _enemies_in_range: Array[Node2D] = []
@@ -34,6 +36,8 @@ func _ready() -> void:
 	_base_damage = damage
 	_base_range_px = range_px
 	_base_attack_speed = attack_speed
+	_base_aoe_radius = projectile_aoe_radius
+	_base_slow_duration = projectile_slow_duration
 	# Apply any cards picked so far
 	_apply_card_modifiers()
 	var shape: CircleShape2D = _range_area.get_node("CollisionShape2D").shape as CircleShape2D
@@ -51,6 +55,8 @@ func _apply_card_modifiers() -> void:
 	damage = int(_base_damage * mods.get("damage", 1.0))
 	range_px = _base_range_px * mods.get("range", 1.0)
 	attack_speed = _base_attack_speed * mods.get("attack_speed", 1.0)
+	projectile_aoe_radius = _base_aoe_radius * mods.get("aoe_radius", 1.0)
+	projectile_slow_duration = _base_slow_duration * mods.get("slow_intensity", 1.0)
 	# Apply curse damage penalty on top of normal multipliers (Step 8)
 	if CardManager.curse_damage_penalty > 0.0:
 		damage = int(damage * (1.0 - CardManager.curse_damage_penalty))
