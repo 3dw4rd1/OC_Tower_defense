@@ -4,6 +4,7 @@ const SPLASH_RADIUS: float = 48.0
 
 
 func _ready() -> void:
+	_tower_type = "splash"
 	damage = 15
 	range_px = 64.0
 	attack_speed = 1.0

@@ -2,6 +2,7 @@ extends "res://scripts/towers/tower_base.gd"
 
 
 func _ready() -> void:
+	_tower_type = "sniper"
 	damage = 40
 	range_px = 192.0
 	attack_speed = 0.4

@@ -1,0 +1,132 @@
+[
+  {
+    "id": "rifle_chain",
+    "name": "Kill Chain",
+    "description": "Every 10th kill by any Rifle Post triggers a free volley from all Rifle Posts simultaneously. Stacks reduce trigger count by 2.",
+    "flavor_text": "Ten down. All guns speak.",
+    "rarity": "rare",
+    "tower_affinity": "basic",
+    "effect": "rifle_kill_chain",
+    "effect_params": { "trigger_kills": 10, "stack_reduction": 2 }
+  },
+  {
+    "id": "rifle_dmg_3",
+    "name": "Overcharge",
+    "description": "Every 5th shot from a Rifle Post deals 3x damage.",
+    "flavor_text": "Build up. Release.",
+    "rarity": "rare",
+    "tower_affinity": "basic",
+    "effect": "rifle_overcharge",
+    "effect_params": { "interval": 5, "multiplier": 3.0 }
+  },
+  {
+    "id": "sniper_execute",
+    "name": "Execute",
+    "description": "Sniper Nests instantly kill enemies below 10% HP.",
+    "flavor_text": "No mercy for the wounded.",
+    "rarity": "rare",
+    "tower_affinity": "sniper",
+    "effect": "sniper_execute",
+    "effect_params": { "hp_threshold": 0.10 }
+  },
+  {
+    "id": "sniper_suppress",
+    "name": "Suppress",
+    "description": "Sniper hits cause enemies to move 30% slower for 2 seconds.",
+    "flavor_text": "Hit them once. Keep them scared.",
+    "rarity": "rare",
+    "tower_affinity": "sniper",
+    "effect": "sniper_suppress",
+    "effect_params": { "slow_amount": 0.30, "duration": 2.0 }
+  },
+  {
+    "id": "splash_dot",
+    "name": "Firebomb",
+    "description": "Molotov explosions leave burning ground for 2 seconds, dealing damage over time.",
+    "flavor_text": "The ground itself hungers.",
+    "rarity": "rare",
+    "tower_affinity": "splash",
+    "effect": "splash_fire_dot",
+    "effect_params": { "duration": 2.0 }
+  },
+  {
+    "id": "splash_knockback",
+    "name": "Concussive",
+    "description": "Molotov explosions knock enemies back slightly.",
+    "flavor_text": "The blast wave hits before the fire.",
+    "rarity": "rare",
+    "tower_affinity": "splash",
+    "effect": "splash_knockback",
+    "effect_params": {}
+  },
+  {
+    "id": "slow_aura",
+    "name": "Tangle Field",
+    "description": "Barbed Wire gains a passive slow aura affecting all enemies in range, in addition to its projectiles.",
+    "flavor_text": "You don't have to touch the wire to be slowed by it.",
+    "rarity": "rare",
+    "tower_affinity": "slow",
+    "effect": "slow_aura",
+    "effect_params": {}
+  },
+  {
+    "id": "slow_dot",
+    "name": "Infected Wound",
+    "description": "Enemies hit by Barbed Wire take damage over time while slowed.",
+    "flavor_text": "The wound festers. The horde thins.",
+    "rarity": "rare",
+    "tower_affinity": "slow",
+    "effect": "slow_dot",
+    "effect_params": {}
+  },
+  {
+    "id": "synergy_frost_fire",
+    "name": "Frost and Fire",
+    "description": "Enemies slowed by Barbed Wire that are hit by a Molotov explosion are instantly frozen for 0.5 seconds. Requires both tower types placed.",
+    "flavor_text": "Cold slows. Fire finishes.",
+    "rarity": "rare",
+    "tower_affinity": "splash",
+    "effect": "synergy_frost_fire",
+    "effect_params": { "freeze_duration": 0.5 }
+  },
+  {
+    "id": "economy_blood_money",
+    "name": "Blood Money",
+    "description": "Brutes drop triple gold for the next 3 waves.",
+    "flavor_text": "The big ones are worth more alive. Well, dead.",
+    "rarity": "rare",
+    "tower_affinity": null,
+    "effect": "curse_brute_gold_boost",
+    "effect_params": { "multiplier": 3.0, "waves": 3 }
+  },
+  {
+    "id": "map_clearcut",
+    "name": "Clearcut",
+    "description": "Remove 3 random obstacle tiles from the map.",
+    "flavor_text": "Clear the ground. Make room to fight.",
+    "rarity": "rare",
+    "tower_affinity": null,
+    "effect": "remove_obstacles",
+    "effect_params": { "count": 3 }
+  },
+  {
+    "id": "map_overgrowth",
+    "name": "Overgrowth",
+    "description": "4 new obstacle tiles spawn in random open positions. Reshapes zombie routing.",
+    "flavor_text": "The forest fights back.",
+    "rarity": "rare",
+    "tower_affinity": null,
+    "effect": "spawn_obstacles",
+    "effect_params": { "count": 4 }
+  },
+  {
+    "id": "curse_dead_weight",
+    "name": "Dead Weight",
+    "description": "One random tower type is permanently removed from your card pool. Gain +30% to all cards for your highest-specialisation tower type.",
+    "flavor_text": "Sacrifice the weak. Strengthen the strong.",
+    "rarity": "rare",
+    "tower_affinity": null,
+    "effect": "curse_remove_affinity",
+    "effect_params": { "boost": 0.30 }
+  }
+]

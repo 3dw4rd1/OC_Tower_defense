@@ -1,0 +1,132 @@
+[
+  {
+    "id": "rifle_atkspd_2",
+    "name": "Full Auto",
+    "description": "Rifle Posts fire 35% faster.",
+    "flavor_text": "Hold the trigger and pray.",
+    "rarity": "uncommon",
+    "tower_affinity": "basic",
+    "effect": "tower_attack_speed",
+    "effect_params": { "tower_type": "basic", "multiplier": 0.35 }
+  },
+  {
+    "id": "rifle_dmg_2",
+    "name": "Armour Piercing",
+    "description": "Rifle Posts deal 25% more damage.",
+    "flavor_text": "Straight through the skull.",
+    "rarity": "uncommon",
+    "tower_affinity": "basic",
+    "effect": "tower_damage",
+    "effect_params": { "tower_type": "basic", "multiplier": 0.25 }
+  },
+  {
+    "id": "sniper_dmg_2",
+    "name": "Lethal Precision",
+    "description": "Sniper Nests deal 40% more damage.",
+    "flavor_text": "One bullet. One less problem.",
+    "rarity": "uncommon",
+    "tower_affinity": "sniper",
+    "effect": "tower_damage",
+    "effect_params": { "tower_type": "sniper", "multiplier": 0.40 }
+  },
+  {
+    "id": "splash_radius_2",
+    "name": "Shrapnel",
+    "description": "Molotov Pit AoE radius increases by 35%.",
+    "flavor_text": "The shards find everyone.",
+    "rarity": "uncommon",
+    "tower_affinity": "splash",
+    "effect": "tower_aoe_radius",
+    "effect_params": { "tower_type": "splash", "multiplier": 0.35 }
+  },
+  {
+    "id": "slow_range_2",
+    "name": "Wide Net",
+    "description": "Barbed Wire gains 35% range.",
+    "flavor_text": "No escape. The wire is everywhere.",
+    "rarity": "uncommon",
+    "tower_affinity": "slow",
+    "effect": "tower_range",
+    "effect_params": { "tower_type": "slow", "multiplier": 0.35 }
+  },
+  {
+    "id": "synergy_slow_sniper",
+    "name": "Spotter",
+    "description": "Slowed enemies take 30% bonus damage from Sniper Nests.",
+    "flavor_text": "Pin them down. Let the marksman finish it.",
+    "rarity": "uncommon",
+    "tower_affinity": "sniper",
+    "effect": "synergy_slow_sniper_bonus",
+    "effect_params": { "bonus": 0.30 }
+  },
+  {
+    "id": "synergy_slow_dmg",
+    "name": "Lacerating",
+    "description": "Enemies slowed by Barbed Wire take 25% bonus damage from all sources.",
+    "flavor_text": "The wire opens wounds. Everything else pours through.",
+    "rarity": "uncommon",
+    "tower_affinity": "slow",
+    "effect": "synergy_slow_all_bonus",
+    "effect_params": { "bonus": 0.25 }
+  },
+  {
+    "id": "economy_wave_2",
+    "name": "Wartime Economy",
+    "description": "Wave end gold bonus +100g.",
+    "flavor_text": "Crisis breeds efficiency.",
+    "rarity": "uncommon",
+    "tower_affinity": null,
+    "effect": "wave_bonus_flat",
+    "effect_params": { "amount": 100 }
+  },
+  {
+    "id": "economy_cost_1",
+    "name": "Bulk Order",
+    "description": "All towers cost 10% less gold to place.",
+    "flavor_text": "Buy in bulk, save lives.",
+    "rarity": "uncommon",
+    "tower_affinity": null,
+    "effect": "tower_cost_reduction",
+    "effect_params": { "reduction": 0.10 }
+  },
+  {
+    "id": "map_dead_ground",
+    "name": "Dead Ground",
+    "description": "One random open tile becomes difficult terrain — enemies crossing it move at 70% speed permanently.",
+    "flavor_text": "This ground belongs to the dead.",
+    "rarity": "uncommon",
+    "tower_affinity": null,
+    "effect": "spawn_slow_tile",
+    "effect_params": {}
+  },
+  {
+    "id": "meta_lucky_1",
+    "name": "Survivor's Instinct",
+    "description": "Rare and Legendary card drop chances permanently increased by 8%. Stackable.",
+    "flavor_text": "Luck is just pattern recognition under pressure.",
+    "rarity": "uncommon",
+    "tower_affinity": null,
+    "effect": "rare_weight_boost",
+    "effect_params": {}
+  },
+  {
+    "id": "curse_horde",
+    "name": "Horde Surge",
+    "description": "The next wave spawns 40% more enemies. In return, draw 2 cards instead of 1 at the end of that wave.",
+    "flavor_text": "More of them. More reward.",
+    "rarity": "uncommon",
+    "tower_affinity": null,
+    "effect": "curse_next_wave_horde",
+    "effect_params": {}
+  },
+  {
+    "id": "curse_brittle",
+    "name": "Brittle Towers",
+    "description": "All towers deal 20% less damage for 2 waves. Gain 150g immediately.",
+    "flavor_text": "Every weapon has its price.",
+    "rarity": "uncommon",
+    "tower_affinity": null,
+    "effect": "curse_temp_damage_penalty",
+    "effect_params": { "penalty": 0.20, "waves": 2, "gold_reward": 150 }
+  }
+]

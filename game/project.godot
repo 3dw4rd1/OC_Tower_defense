@@ -23,6 +23,7 @@ WaveManager="*res://scripts/autoloads/WaveManager.gd"
 EconomyManager="*res://scripts/autoloads/EconomyManager.gd"
 PathfindingManager="*res://scripts/autoloads/PathfindingManager.gd"
 TerrainManager="*res://scripts/autoloads/TerrainManager.gd"
+CardManager="*res://scripts/autoloads/CardManager.gd"
 
 [display]
 

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "rifle_atkspd_1",
+    "name": "Hair Trigger",
+    "description": "Rifle Posts fire 20% faster.",
+    "flavor_text": "No time to aim. Just shoot.",
+    "rarity": "common",
+    "tower_affinity": "basic",
+    "effect": "tower_attack_speed",
+    "effect_params": { "tower_type": "basic", "multiplier": 0.20 }
+  },
+  {
+    "id": "rifle_range_1",
+    "name": "Extended Barrel",
+    "description": "Rifle Posts gain 15% range.",
+    "flavor_text": "A longer barrel means a longer reach.",
+    "rarity": "common",
+    "tower_affinity": "basic",
+    "effect": "tower_range",
+    "effect_params": { "tower_type": "basic", "multiplier": 0.15 }
+  },
+  {
+    "id": "sniper_dmg_1",
+    "name": "Hollow Point",
+    "description": "Sniper Nests deal 20% more damage.",
+    "flavor_text": "Precision and lethality in one package.",
+    "rarity": "common",
+    "tower_affinity": "sniper",
+    "effect": "tower_damage",
+    "effect_params": { "tower_type": "sniper", "multiplier": 0.20 }
+  },
+  {
+    "id": "sniper_range_1",
+    "name": "Eagle Eye",
+    "description": "Sniper Nests gain 20% range.",
+    "flavor_text": "The enemy never knew what hit them.",
+    "rarity": "common",
+    "tower_affinity": "sniper",
+    "effect": "tower_range",
+    "effect_params": { "tower_type": "sniper", "multiplier": 0.20 }
+  },
+  {
+    "id": "splash_dmg_1",
+    "name": "Extra Fuel",
+    "description": "Molotov Pits deal 15% more damage.",
+    "flavor_text": "Burn it all down.",
+    "rarity": "common",
+    "tower_affinity": "splash",
+    "effect": "tower_damage",
+    "effect_params": { "tower_type": "splash", "multiplier": 0.15 }
+  },
+  {
+    "id": "splash_radius_1",
+    "name": "Wide Spread",
+    "description": "Molotov Pit AoE radius increases by 20%.",
+    "flavor_text": "More surface area, more fire.",
+    "rarity": "common",
+    "tower_affinity": "splash",
+    "effect": "tower_aoe_radius",
+    "effect_params": { "tower_type": "splash", "multiplier": 0.20 }
+  },
+  {
+    "id": "slow_intensity_1",
+    "name": "Deep Snag",
+    "description": "Barbed Wire slows enemies 15% more.",
+    "flavor_text": "Caught in the wire, they struggle and fall.",
+    "rarity": "common",
+    "tower_affinity": "slow",
+    "effect": "tower_slow_intensity",
+    "effect_params": { "tower_type": "slow", "multiplier": 0.15 }
+  },
+  {
+    "id": "slow_atkspd_1",
+    "name": "Rapid Coil",
+    "description": "Barbed Wire fires 25% faster.",
+    "flavor_text": "Faster coils, faster kills.",
+    "rarity": "common",
+    "tower_affinity": "slow",
+    "effect": "tower_attack_speed",
+    "effect_params": { "tower_type": "slow", "multiplier": 0.25 }
+  },
+  {
+    "id": "economy_wave_1",
+    "name": "Scroungers",
+    "description": "Wave end gold bonus +50g.",
+    "flavor_text": "Every bullet casing counts.",
+    "rarity": "common",
+    "tower_affinity": null,
+    "effect": "wave_bonus_flat",
+    "effect_params": { "amount": 50 }
+  },
+  {
+    "id": "economy_kill_1",
+    "name": "Bounty Board",
+    "description": "All enemies drop +2g on death.",
+    "flavor_text": "Dead or alive. Preferably dead.",
+    "rarity": "common",
+    "tower_affinity": null,
+    "effect": "kill_gold_flat",
+    "effect_params": { "amount": 2 }
+  }
+]

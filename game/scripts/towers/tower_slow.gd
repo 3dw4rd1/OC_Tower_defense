@@ -4,6 +4,7 @@ const SLOW_DURATION: float = 2.0
 
 
 func _ready() -> void:
+	_tower_type = "slow"
 	damage = 5
 	range_px = 96.0
 	attack_speed = 2.0

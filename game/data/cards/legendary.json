@@ -1,0 +1,92 @@
+[
+  {
+    "id": "rifle_legendary_bounce",
+    "name": "Ricochet",
+    "description": "Rifle Post shots bounce to the nearest enemy within 64px after hitting their target.",
+    "flavor_text": "One bullet. Two graves.",
+    "rarity": "legendary",
+    "tower_affinity": "basic",
+    "effect": "rifle_ricochet",
+    "effect_params": { "bounce_range": 64 }
+  },
+  {
+    "id": "rifle_legendary_double",
+    "name": "Double Tap",
+    "description": "Rifle Posts fire a second shot at a random enemy in range 0.1s after each primary shot.",
+    "flavor_text": "The first shot wakes them. The second puts them down.",
+    "rarity": "legendary",
+    "tower_affinity": "basic",
+    "effect": "rifle_double_tap",
+    "effect_params": { "delay": 0.1 }
+  },
+  {
+    "id": "sniper_legendary_chain",
+    "name": "Chain Suppress",
+    "description": "Suppress effect spreads to all enemies within 80px of the hit target.",
+    "flavor_text": "One shot. A squad pinned.",
+    "rarity": "legendary",
+    "tower_affinity": "sniper",
+    "effect": "sniper_chain_suppress",
+    "effect_params": { "spread_range": 80 }
+  },
+  {
+    "id": "sniper_legendary_oneshot",
+    "name": "One Shot",
+    "description": "Sniper Nests have a 25% chance to instantly kill any Shambler.",
+    "flavor_text": "Most of them never see it coming.",
+    "rarity": "legendary",
+    "tower_affinity": "sniper",
+    "effect": "sniper_one_shot",
+    "effect_params": { "chance": 0.25 }
+  },
+  {
+    "id": "splash_legendary_napalm",
+    "name": "Napalm",
+    "description": "Burning ground from Firebomb stacks — enemies that re-enter burning tiles take double fire damage. Requires Firebomb (rare).",
+    "flavor_text": "Walk back into the fire. See what happens.",
+    "rarity": "legendary",
+    "tower_affinity": "splash",
+    "effect": "splash_napalm",
+    "effect_params": {}
+  },
+  {
+    "id": "splash_legendary_shockwave",
+    "name": "Shockwave",
+    "description": "Molotov knockback becomes a stun — enemies are frozen for 0.5s on knockback. Requires Concussive (rare).",
+    "flavor_text": "The blast doesn't just push. It stops.",
+    "rarity": "legendary",
+    "tower_affinity": "splash",
+    "effect": "splash_shockwave",
+    "effect_params": { "stun_duration": 0.5 }
+  },
+  {
+    "id": "slow_legendary_plague",
+    "name": "Plague Pulse",
+    "description": "Barbed Wire periodically emits a wide-range slow pulse affecting all enemies in a large radius every 3 seconds.",
+    "flavor_text": "You feel it in your legs first.",
+    "rarity": "legendary",
+    "tower_affinity": "slow",
+    "effect": "slow_plague_pulse",
+    "effect_params": { "interval": 3.0 }
+  },
+  {
+    "id": "slow_legendary_tangle",
+    "name": "Tangle Field+",
+    "description": "Barbed Wire aura now fully stops enemies for 0.3s when they first enter range. Requires Tangle Field (rare).",
+    "flavor_text": "The wire doesn't just slow. It holds.",
+    "rarity": "legendary",
+    "tower_affinity": "slow",
+    "effect": "slow_full_stop",
+    "effect_params": { "stop_duration": 0.3 }
+  },
+  {
+    "id": "killbox_legendary",
+    "name": "The Killbox",
+    "description": "Enemies within a Splash explosion radius take 60% bonus damage from Sniper Nests for 3 seconds after the explosion. Requires both tower types placed at high specialisation.",
+    "flavor_text": "Every inch of that clearing is a death sentence.",
+    "rarity": "legendary",
+    "tower_affinity": "sniper",
+    "effect": "synergy_killbox",
+    "effect_params": { "bonus": 0.60, "duration": 3.0 }
+  }
+]

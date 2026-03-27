@@ -4,6 +4,7 @@ enum GameState {
 	SETUP,
 	WAVE_ACTIVE,
 	WAVE_COMPLETE,
+	CARD_DRAFT,
 	GAME_OVER,
 	VICTORY
 }
@@ -20,6 +21,11 @@ var state: GameState = GameState.SETUP
 var current_wave: int = 0
 var base_hp: int = 50
 var gold: int = 1000
+
+
+func _ready() -> void:
+	# Transition out of CARD_DRAFT when a card is picked
+	CardManager.card_picked.connect(_on_card_picked)
 
 
 func add_gold(amount: int) -> void:
@@ -44,6 +50,8 @@ func damage_base(amount: int) -> void:
 
 
 func start_next_wave() -> void:
+	if state == GameState.CARD_DRAFT:
+		return  # Block wave start while draft is in progress
 	current_wave += 1
 	_set_state(GameState.WAVE_ACTIVE)
 	WaveManager.start_wave(current_wave)
@@ -55,6 +63,12 @@ func end_wave() -> void:
 		_set_state(GameState.VICTORY)
 		victory.emit()
 	else:
+		_set_state(GameState.CARD_DRAFT)
+		CardManager.start_draft()
+
+
+func _on_card_picked(_card: Dictionary) -> void:
+	if state == GameState.CARD_DRAFT:
 		_set_state(GameState.WAVE_COMPLETE)
 
 

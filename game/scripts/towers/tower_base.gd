@@ -12,6 +12,14 @@ var projectile_aoe_radius: float = 0.0
 var projectile_slow_duration: float = 0.0
 var range_color: Color = Color(1.0, 1.0, 1.0, 1.0)
 
+# Tower type string set by each subclass before calling super._ready()
+var _tower_type: String = ""
+
+# Base stats captured at _ready() time; _apply_card_modifiers() always multiplies from these
+var _base_damage: int = 0
+var _base_range_px: float = 0.0
+var _base_attack_speed: float = 0.0
+
 var _attack_timer: float = 0.0
 var _enemies_in_range: Array[Node2D] = []
 var _range_indicator: Node2D = null
@@ -22,10 +30,39 @@ var _range_indicator: Node2D = null
 func _ready() -> void:
 	_range_area.body_entered.connect(_on_body_entered)
 	_range_area.body_exited.connect(_on_body_exited)
+	# Capture base stats (subclass has already set them before calling super._ready())
+	_base_damage = damage
+	_base_range_px = range_px
+	_base_attack_speed = attack_speed
+	# Apply any cards picked so far
+	_apply_card_modifiers()
 	var shape: CircleShape2D = _range_area.get_node("CollisionShape2D").shape as CircleShape2D
 	if shape:
 		shape.radius = range_px
 	_add_range_indicator()
+	# Update when future cards are picked
+	CardManager.card_picked.connect(_on_card_picked)
+
+
+func _apply_card_modifiers() -> void:
+	if _tower_type == "":
+		return
+	var mods: Dictionary = CardManager.get_tower_multipliers(_tower_type)
+	damage = int(_base_damage * mods.get("damage", 1.0))
+	range_px = _base_range_px * mods.get("range", 1.0)
+	attack_speed = _base_attack_speed * mods.get("attack_speed", 1.0)
+
+
+func _on_card_picked(_card: Dictionary) -> void:
+	_apply_card_modifiers()
+	# Update collision shape radius to match new range_px
+	if _range_area:
+		var shape: CircleShape2D = _range_area.get_node("CollisionShape2D").shape as CircleShape2D
+		if shape:
+			shape.radius = range_px
+	if _range_indicator:
+		_range_indicator.set_meta("radius", range_px)
+		_range_indicator.queue_redraw()
 
 
 func _add_range_indicator() -> void:
