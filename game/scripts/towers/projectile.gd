@@ -1,5 +1,8 @@
 extends Node2D
 
+const FIRE_TILE_SCRIPT = preload("res://scripts/towers/fire_tile.gd")
+const SLOW_DOT_SCRIPT = preload("res://scripts/towers/slow_dot.gd")
+
 var target: Node2D = null
 var speed: float = 200.0
 var damage: int = 10
@@ -77,6 +80,13 @@ func _on_hit() -> void:
 			if slow_duration > 0.0 and target.has_method("apply_slow"):
 				target.apply_slow(0.5, slow_duration)
 
+			# slow_dot: if slow tower hits an already-slowed enemy, apply DoT
+			if tower_type == "slow" and CardManager.has_effect("slow_dot") and target_slowed:
+				if target.find_child("SlowDoT") == null:
+					var dot: Node2D = SLOW_DOT_SCRIPT.new()
+					target.add_child(dot)
+					print("[slow_dot] applied DoT to %s" % target.name)
+
 			# sniper_suppress: slow the primary hit target
 			if tower_type == "sniper" and CardManager.has_effect("sniper_suppress") \
 					and target.has_method("apply_slow"):
@@ -118,6 +128,34 @@ func _apply_aoe(hit_pos: Vector2) -> void:
 		var aoe_enemies: Array = []
 		_collect_enemies_in_radius(get_tree().current_scene, hit_pos, aoe_enemies)
 		_apply_aoe_synergies(aoe_enemies)
+
+	# splash_knockback / splash_shockwave
+	if CardManager.has_effect("splash_knockback"):
+		var kb_enemies: Array = []
+		_collect_enemies_in_radius(get_tree().current_scene, hit_pos, kb_enemies)
+		for e: Node2D in kb_enemies:
+			if not is_instance_valid(e):
+				continue
+			if CardManager.has_effect("splash_shockwave"):
+				# shockwave replaces velocity knockback with a freeze
+				if e.has_method("freeze"):
+					e.freeze(0.5)
+			else:
+				var vel_val = e.get("velocity")
+				if vel_val != null:
+					e.velocity += (e.global_position - hit_pos).normalized() * 150.0
+
+	# splash_fire_dot: leave a burning zone at impact point
+	if CardManager.has_effect("splash_fire_dot"):
+		_spawn_fire_tile(hit_pos)
+
+
+func _spawn_fire_tile(hit_pos: Vector2) -> void:
+	var tile: Node2D = FIRE_TILE_SCRIPT.new()
+	tile.radius = aoe_radius
+	tile.tick_damage = max(1, damage / 4)
+	tile.global_position = hit_pos
+	get_parent().add_child(tile)
 
 
 func _damage_in_radius(node: Node, hit_pos: Vector2) -> void:
