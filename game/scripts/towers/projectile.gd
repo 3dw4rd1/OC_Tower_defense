@@ -108,7 +108,7 @@ func _on_hit() -> void:
 			var ricochet_target: Node2D = _find_nearest_enemy_near(
 					get_tree().current_scene, hit_pos, 64.0, target)
 			if ricochet_target != null:
-				var proj: Node2D = PROJECTILE_SCENE.instantiate()
+				var proj: Node2D = load("res://scenes/towers/Projectile.tscn").instantiate()
 				proj.target = ricochet_target
 				proj.damage = damage
 				proj.color = color
