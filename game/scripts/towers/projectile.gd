@@ -51,10 +51,62 @@ func _on_hit() -> void:
 			actual_damage = int(actual_damage * (1.0 + bonus))
 			print("[synergy] killbox: sniper dealt %d on killbox-marked enemy" % actual_damage)
 
+		# sniper_one_shot: 25% chance to instantly kill basic enemies
+		if tower_type == "sniper" and CardManager.has_effect("sniper_one_shot") \
+				and target.get("_enemy_type") == "basic" and randf() < 0.25:
+			actual_damage = 9999
+			print("[sniper_one_shot] one-shot triggered")
+
+		# sniper_execute: instantly kill enemies at or below 10% max HP
+		if tower_type == "sniper" and CardManager.has_effect("sniper_execute"):
+			var max_hp = target.get("_max_hp")
+			var cur_hp = target.get("_hp")
+			if max_hp != null and cur_hp != null and int(cur_hp) <= int(int(max_hp) * 0.10):
+				actual_damage = 9999
+				print("[sniper_execute] execute at %d/%d hp" % [cur_hp, max_hp])
+
+		# Set last-hit tower type so kill-chain tracking works in _die()
+		if target.get("_last_hit_tower_type") != null:
+			target._last_hit_tower_type = tower_type
+
 		if target.has_method("take_damage"):
 			target.take_damage(actual_damage)
-		if slow_duration > 0.0 and target.has_method("apply_slow"):
-			target.apply_slow(0.5, slow_duration)
+
+		# Post-hit effects that require target still alive
+		if is_instance_valid(target):
+			if slow_duration > 0.0 and target.has_method("apply_slow"):
+				target.apply_slow(0.5, slow_duration)
+
+			# sniper_suppress: slow the primary hit target
+			if tower_type == "sniper" and CardManager.has_effect("sniper_suppress") \
+					and target.has_method("apply_slow"):
+				target.apply_slow(0.30, 2.0)
+				print("[sniper_suppress] suppressed target")
+
+		# sniper_chain_suppress: also slow enemies within 80px of hit position
+		if tower_type == "sniper" and CardManager.has_effect("sniper_chain_suppress"):
+			var chain_enemies: Array = []
+			_collect_enemies_near(get_tree().current_scene, hit_pos, 80.0, chain_enemies, target)
+			for e: Node2D in chain_enemies:
+				if is_instance_valid(e) and e.has_method("apply_slow"):
+					e.apply_slow(0.30, 2.0)
+			if chain_enemies.size() > 0:
+				print("[sniper_chain_suppress] chain-suppressed %d enemies" % chain_enemies.size())
+
+		# rifle_ricochet: bounce a new projectile to the nearest enemy within 64px
+		if tower_type == "basic" and CardManager.has_effect("rifle_ricochet"):
+			var ricochet_target: Node2D = _find_nearest_enemy_near(
+					get_tree().current_scene, hit_pos, 64.0, target)
+			if ricochet_target != null:
+				var proj: Node2D = PROJECTILE_SCENE.instantiate()
+				proj.target = ricochet_target
+				proj.damage = damage
+				proj.color = color
+				proj.tower_type = tower_type
+				proj.global_position = hit_pos
+				get_parent().add_child(proj)
+				print("[rifle_ricochet] ricocheted to nearby enemy")
+
 	if aoe_radius > 0.0:
 		_apply_aoe(hit_pos)
 	queue_free()
@@ -108,3 +160,26 @@ func _apply_aoe_synergies(enemies: Array) -> void:
 		print("[synergy] frost_fire: froze %d slowed enemies" % frost_count)
 	if killbox_count > 0:
 		print("[synergy] killbox: marked %d enemies in blast radius" % killbox_count)
+
+
+func _collect_enemies_near(node: Node, pos: Vector2, radius: float, result: Array, exclude: Node2D) -> void:
+	for child in node.get_children():
+		if child != exclude and child.has_method("take_damage"):
+			if pos.distance_to(child.global_position) <= radius:
+				result.append(child)
+		if child.get_child_count() > 0:
+			_collect_enemies_near(child, pos, radius, result, exclude)
+
+
+func _find_nearest_enemy_near(node: Node, pos: Vector2, radius: float, exclude: Node2D) -> Node2D:
+	var candidates: Array = []
+	_collect_enemies_near(node, pos, radius, candidates, exclude)
+	var nearest: Node2D = null
+	var nearest_dist: float = INF
+	for e in candidates:
+		if is_instance_valid(e):
+			var d: float = pos.distance_to(e.global_position)
+			if d < nearest_dist:
+				nearest_dist = d
+				nearest = e
+	return nearest
