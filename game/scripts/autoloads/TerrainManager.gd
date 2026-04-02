@@ -279,13 +279,15 @@ func _generate_river() -> void:
 
 
 func _paint_river() -> void:
+	# River rects are added to _game_map (TileMap) so they render above the ground
+	# but below enemies, towers, and the base — all of which live in later scene nodes.
 	for cell in river_tiles.keys():
 		var world_pos: Vector2 = PathfindingManager.tile_to_world(cell)
 		var rect := ColorRect.new()
 		rect.color = Color(0.72, 0.65, 0.45, 1.0)
 		rect.size = Vector2(16, 16)
 		rect.position = world_pos - Vector2(8.0, 8.0)
-		_obstacles_container.add_child(rect)
+		_game_map.add_child(rect)
 
 
 func _paint_obstacles() -> void:
