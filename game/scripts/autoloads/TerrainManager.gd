@@ -226,12 +226,15 @@ func _spawn_obstacle(cell: Vector2i) -> void:
 	var body := StaticBody2D.new()
 	body.position = world_pos
 
-	# Visual — 14x14 grey square centred in the tile
-	var rect := ColorRect.new()
-	rect.color = Color(0.7, 0.7, 0.7, 1.0)
-	rect.size = Vector2(14, 14)
-	rect.position = Vector2(-7, -7)
-	body.add_child(rect)
+	# Visual — tree sprite, randomly Tree1 or Tree2 from sprite sheet
+	var sprite := Sprite2D.new()
+	var texture := load("res://assets/sprites/terrain/TreeSpriteSheet_Tree1Tree2.png")
+	sprite.texture = texture
+	sprite.region_enabled = true
+	var tree_variant: int = randi() % 2
+	sprite.region_rect = Rect2(tree_variant * 16, 0, 16, 16)
+	sprite.centered = true  # Sprite2D is centred at position(0,0) which is body.position = world_pos
+	body.add_child(sprite)
 
 	# Collision — matches visual size
 	var collision := CollisionShape2D.new()
