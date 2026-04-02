@@ -32,6 +32,12 @@ mouse_filter = 2
 theme_override_constants/separation = 6
 mouse_filter = 2
 
+[node name="AccentStrip" type="ColorRect" parent="MarginContainer/VBox"]
+custom_minimum_size = Vector2(0, 3)
+size_flags_horizontal = 3
+mouse_filter = 2
+color = Color(0.50, 0.50, 0.52, 1.0)
+
 [node name="NameLabel" type="Label" parent="MarginContainer/VBox"]
 theme_override_font_sizes/font_size = 15
 text = "Card Name"
