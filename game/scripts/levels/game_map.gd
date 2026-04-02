@@ -118,6 +118,8 @@ func _is_tile_valid(tile_pos: Vector2i) -> bool:
 		return false
 	if TerrainManager.is_obstacle(tile_pos):
 		return false
+	if TerrainManager.is_river_tile(tile_pos):
+		return false
 	if _placed_tiles.has(tile_pos):
 		return false
 	if selected_tower_type == "wall" and _wall_count >= MAX_WALL_TOWERS:

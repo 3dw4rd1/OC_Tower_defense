@@ -14,6 +14,7 @@ const BASE_CLEAR_RADIUS: int = 5
 
 var obstacle_tiles: Dictionary = {}
 var slow_tiles: Dictionary = {}          # cell → true for tiles that slow enemies to 70%
+var river_tiles: Dictionary = {}         # cell → true for river corridor tiles
 var _game_map: Node = null
 var _obstacles_container: Node2D = null
 var _obstacle_nodes: Dictionary = {}     # cell → StaticBody2D, for runtime removal
@@ -23,8 +24,10 @@ func initialise(game_map: Node, obstacles_container: Node2D) -> void:
 	_game_map = game_map
 	_obstacles_container = obstacles_container
 	_generate_obstacles()
+	_generate_river()
 	_validate_paths()
 	_paint_obstacles()
+	_paint_river()
 
 
 func is_obstacle(cell: Vector2i) -> bool:
@@ -33,6 +36,10 @@ func is_obstacle(cell: Vector2i) -> bool:
 
 func is_slow_tile(cell: Vector2i) -> bool:
 	return slow_tiles.has(cell)
+
+
+func is_river_tile(cell: Vector2i) -> bool:
+	return river_tiles.has(cell)
 
 
 # Removes an obstacle tile at runtime, including its visual node.
@@ -213,6 +220,72 @@ func _bresenham_line(from: Vector2i, to: Vector2i) -> Array[Vector2i]:
 			y0 += sy
 
 	return cells
+
+
+func _generate_river() -> void:
+	# Pick start on left (x=0) or right (x=GRID_COLS-1) edge, y in [8, GRID_ROWS-9]
+	var start_x: int = 0 if randi() % 2 == 0 else GRID_COLS - 1
+	var start_y: int = randi_range(8, GRID_ROWS - 9)
+	var pos := Vector2i(start_x, start_y)
+	var target: Vector2i = BASE_TILE
+	var width_timer: int = 0
+	var max_iter: int = 5000
+	var iter: int = 0
+
+	while pos != target and iter < max_iter:
+		iter += 1
+		river_tiles[pos] = true
+		# Width logic
+		if width_timer == 0:
+			if randf() < 0.20:
+				width_timer = randi_range(2, 4)
+		if width_timer > 0:
+			var above := Vector2i(pos.x, clampi(pos.y - 1, 0, GRID_ROWS - 1))
+			var below := Vector2i(pos.x, clampi(pos.y + 1, 0, GRID_ROWS - 1))
+			river_tiles[above] = true
+			river_tiles[below] = true
+			width_timer -= 1
+
+		# Drunkard's walk biased toward base
+		var roll: float = randf()
+		var dx: int = target.x - pos.x
+		var dy: int = target.y - pos.y
+		if roll < 0.60:
+			# Move toward base on the largest-distance axis
+			if absi(dx) >= absi(dy):
+				pos.x += signi(dx) if dx != 0 else 0
+			else:
+				pos.y += signi(dy) if dy != 0 else 0
+		elif roll < 0.80:
+			pos.y -= 1
+		else:
+			pos.y += 1
+
+		pos.x = clampi(pos.x, 0, GRID_COLS - 1)
+		pos.y = clampi(pos.y, 0, GRID_ROWS - 1)
+
+	# Ensure target tile is included
+	river_tiles[target] = true
+
+	# Clear any obstacle tiles neighbouring the river (1-tile clearance)
+	for cell in river_tiles.keys():
+		for ddx in [-1, 0, 1]:
+			for ddy in [-1, 0, 1]:
+				if ddx == 0 and ddy == 0:
+					continue
+				var neighbour := Vector2i(cell.x + ddx, cell.y + ddy)
+				if obstacle_tiles.has(neighbour):
+					clear_obstacle_tile(neighbour)
+
+
+func _paint_river() -> void:
+	for cell in river_tiles.keys():
+		var world_pos: Vector2 = PathfindingManager.tile_to_world(cell)
+		var rect := ColorRect.new()
+		rect.color = Color(0.72, 0.65, 0.45, 1.0)
+		rect.size = Vector2(16, 16)
+		rect.position = world_pos - Vector2(8.0, 8.0)
+		_obstacles_container.add_child(rect)
 
 
 func _paint_obstacles() -> void:
