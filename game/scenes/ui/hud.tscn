@@ -12,7 +12,7 @@ anchor_top = 1.0
 anchor_bottom = 1.0
 offset_top = -64.0
 offset_bottom = 0.0
-color = Color(0.12, 0.12, 0.14, 1.0)
+color = Color(0.08, 0.10, 0.08, 1.0)
 
 [node name="BottomBar" type="VBoxContainer" parent="."]
 anchor_left = 0.0
@@ -52,23 +52,23 @@ alignment = 1
 
 [node name="BasicBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
-text = "Basic (50g)"
+text = "Rifle Post\n50g"
 
 [node name="SniperBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
-text = "Sniper (100g)"
+text = "Sniper Nest\n100g"
 
 [node name="SplashBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
-text = "Splash (120g)"
+text = "Molotov Pit\n120g"
 
 [node name="SlowBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
-text = "Slow (80g)"
+text = "Slow Tower\n80g"
 
 [node name="WallBtn" type="Button" parent="BottomBar/TowerPanel"]
 size_flags_horizontal = 3
-text = "Wall (25g)"
+text = "Barbed Wire\n25g"
 
 [node name="GameOverOverlay" type="Control" parent="."]
 visible = false

@@ -12,8 +12,10 @@ extends CanvasLayer
 @onready var _slow_btn: Button = $BottomBar/TowerPanel/SlowBtn
 @onready var _wall_btn: Button = $BottomBar/TowerPanel/WallBtn
 
-const SELECTED_MODULATE: Color = Color(1.5, 1.5, 0.6, 1.0)
-const NORMAL_MODULATE: Color = Color(1.0, 1.0, 1.0, 1.0)
+# StyleBoxFlat styles for tower buttons
+var _style_normal: StyleBoxFlat
+var _style_hover: StyleBoxFlat
+var _style_selected: StyleBoxFlat
 
 var _selected_type: String = ""
 var _wall_count: int = 0
@@ -35,14 +37,58 @@ func _ready() -> void:
 	_game_over_overlay.visible = false
 	_victory_overlay.visible = false
 
+	_gold_label.add_theme_color_override("font_color", Color(0.85, 0.70, 0.15))   # Survivor Gold
+	_hp_label.add_theme_color_override("font_color", Color(0.72, 0.12, 0.10))     # Zombie Red
+	_wave_label.add_theme_color_override("font_color", Color(0.90, 0.88, 0.82))   # Dirty White
+	_enemy_count_label.add_theme_color_override("font_color", Color(0.90, 0.88, 0.82))  # Dirty White
+
+	# Build button styles
+	_style_normal = StyleBoxFlat.new()
+	_style_normal.bg_color = Color(0.15, 0.20, 0.13)
+	_style_normal.border_color = Color(0.35, 0.45, 0.28)
+	_style_normal.set_border_width_all(1)
+	_style_normal.set_corner_radius_all(2)
+	_style_normal.set_content_margin_all(8)
+
+	_style_hover = StyleBoxFlat.new()
+	_style_hover.bg_color = Color(0.22, 0.30, 0.18)
+	_style_hover.border_color = Color(0.55, 0.72, 0.40)
+	_style_hover.set_border_width_all(1)
+	_style_hover.set_corner_radius_all(2)
+	_style_hover.set_content_margin_all(8)
+
+	_style_selected = StyleBoxFlat.new()
+	_style_selected.bg_color = Color(0.28, 0.38, 0.22)
+	_style_selected.border_color = Color(0.85, 0.70, 0.15)   # gold border = selected
+	_style_selected.set_border_width_all(2)
+	_style_selected.set_corner_radius_all(2)
+	_style_selected.set_content_margin_all(8)
+
+	# Apply styles to all tower buttons
+	for btn in [_basic_btn, _sniper_btn, _splash_btn, _slow_btn, _wall_btn]:
+		btn.add_theme_stylebox_override("normal", _style_normal)
+		btn.add_theme_stylebox_override("hover", _style_hover)
+		btn.add_theme_stylebox_override("pressed", _style_selected)
+		btn.add_theme_color_override("font_color", Color(0.90, 0.88, 0.82))
+		btn.add_theme_font_size_override("font_size", 12)
+
 
 func set_selected_tower_button(tower_type: String) -> void:
 	_selected_type = tower_type
-	_basic_btn.modulate = SELECTED_MODULATE if tower_type == "basic" else NORMAL_MODULATE
-	_sniper_btn.modulate = SELECTED_MODULATE if tower_type == "sniper" else NORMAL_MODULATE
-	_splash_btn.modulate = SELECTED_MODULATE if tower_type == "splash" else NORMAL_MODULATE
-	_slow_btn.modulate = SELECTED_MODULATE if tower_type == "slow" else NORMAL_MODULATE
-	_wall_btn.modulate = SELECTED_MODULATE if tower_type == "wall" else NORMAL_MODULATE
+	for btn in [_basic_btn, _sniper_btn, _splash_btn, _slow_btn, _wall_btn]:
+		btn.add_theme_stylebox_override("normal", _style_normal)
+		btn.modulate = Color(1, 1, 1, 1)
+
+	var selected_btn: Button = null
+	match tower_type:
+		"basic":   selected_btn = _basic_btn
+		"sniper":  selected_btn = _sniper_btn
+		"splash":  selected_btn = _splash_btn
+		"slow":    selected_btn = _slow_btn
+		"wall":    selected_btn = _wall_btn
+
+	if selected_btn:
+		selected_btn.add_theme_stylebox_override("normal", _style_selected)
 
 
 func _on_gold_changed(new_amount: int) -> void:
@@ -51,6 +97,10 @@ func _on_gold_changed(new_amount: int) -> void:
 
 func _on_base_hp_changed(new_hp: int) -> void:
 	_hp_label.text = "HP: %d / 50" % new_hp
+	if new_hp <= 10:
+		_hp_label.add_theme_color_override("font_color", Color(1.0, 0.15, 0.10))
+	else:
+		_hp_label.add_theme_color_override("font_color", Color(0.72, 0.12, 0.10))
 
 
 func _on_wave_started(wave_num: int) -> void:
@@ -95,7 +145,7 @@ func _on_wall_button_pressed() -> void:
 
 func update_wall_button(count: int) -> void:
 	_wall_count = count
-	_wall_btn.text = "Wall (25g)\n%d/20" % count
+	_wall_btn.text = "Barbed Wire\n25g  %d/20" % count
 
 
 func _select_tower(tower_type: String) -> void:
