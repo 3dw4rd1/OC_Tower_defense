@@ -32,12 +32,13 @@ const LEGACY_WAVE_DATA: Array = [
 ]
 
 const ENEMY_SCENES: Dictionary = {
-	"basic": "res://scenes/enemies/EnemyBasic.tscn",
-	"scout": "res://scenes/enemies/EnemyBasic.tscn",  # same scene, stats overridden at spawn
-	"fast":  "res://scenes/enemies/EnemyFast.tscn",
-	"tank":  "res://scenes/enemies/EnemyTank.tscn",
-	"boss":  "res://scenes/enemies/EnemyTank.tscn",   # boss uses tank scene, stats overridden
-	"elite": "res://scenes/enemies/EnemyElite.tscn",
+	"basic":    "res://scenes/enemies/EnemyBasic.tscn",
+	"scout":    "res://scenes/enemies/EnemyBasic.tscn",  # same scene, stats overridden at spawn
+	"fast":     "res://scenes/enemies/EnemyFast.tscn",
+	"tank":     "res://scenes/enemies/EnemyTank.tscn",
+	"boss":     "res://scenes/enemies/EnemyTank.tscn",   # boss uses tank scene, stats overridden
+	"elite":    "res://scenes/enemies/EnemyElite.tscn",
+	"armored":  "res://scenes/enemies/EnemyArmored.tscn",
 }
 
 # Boss wave gold by tier (waves 5/10/15/20/25)
@@ -181,6 +182,14 @@ func _start_legacy_wave(wave_num: int) -> void:
 		var replace_idx: int = randi() % enemy_list.size()
 		enemy_list[replace_idx] = "elite"
 
+	# Armored injection: wave 13+ introduces armored enemies (5% → 15% by wave 25)
+	if wave_num >= 13:
+		var armored_ratio: float = lerpf(0.05, 0.15, float(clamp(wave_num - 13, 0, 12)) / 12.0)
+		var armored_count: int = int(round(enemy_list.size() * armored_ratio))
+		for i: int in range(armored_count):
+			var replace_idx: int = randi() % enemy_list.size()
+			enemy_list[replace_idx] = "armored"
+
 	print("WaveManager: wave %d — %d enemies (%.0f%% elites), spawn interval %.2fs (count_mult=%.2f)" % [wave_num, enemy_list.size(), elite_ratio * 100, spawn_interval, count_mult])
 	enemy_list.shuffle()
 	_build_spawn_queue(enemy_list, spawn_interval, false)
@@ -209,18 +218,21 @@ func _start_endless_wave(wave_num: int) -> void:
 	var total_count: int = int(ceil(base_count * count_mult))
 	var spawn_interval: float = max(0.15, 0.22 * pow(0.97, endless_step))
 
-	# Mix: basic / fast / tank / elite, elite ratio grows over time
-	var elite_ratio: float  = min(0.35, 0.25 + endless_step * 0.01)
-	var tank_ratio: float   = 0.20
-	var fast_ratio: float   = 0.25
+	# Mix: basic / fast / tank / elite / armored, ratios grow over time
+	var elite_ratio: float    = min(0.30, 0.25 + endless_step * 0.01)
+	var armored_ratio: float  = min(0.15, 0.10 + endless_step * 0.005)
+	var tank_ratio: float     = 0.18
+	var fast_ratio: float     = 0.22
 	var enemy_list: Array[String] = []
 	for _i: int in range(total_count):
 		var roll: float = randf()
 		if roll < elite_ratio:
 			enemy_list.append("elite")
-		elif roll < elite_ratio + tank_ratio:
+		elif roll < elite_ratio + armored_ratio:
+			enemy_list.append("armored")
+		elif roll < elite_ratio + armored_ratio + tank_ratio:
 			enemy_list.append("tank")
-		elif roll < elite_ratio + tank_ratio + fast_ratio:
+		elif roll < elite_ratio + armored_ratio + tank_ratio + fast_ratio:
 			enemy_list.append("fast")
 		else:
 			enemy_list.append("basic")
@@ -341,6 +353,8 @@ func _do_spawn(enemy_type: String) -> void:
 				base_hp = 600; base_speed = 40.0 * 2.1
 			"elite":
 				base_hp = 400; base_speed = 96.0 * 2.1
+			"armored":
+				base_hp = 200; base_speed = 60.0 * 2.1  # armor handles effective HP
 			_:
 				base_hp = 300; base_speed = 80.0 * 2.1
 		enemy._hp = int(base_hp * _endless_hp_mult)
