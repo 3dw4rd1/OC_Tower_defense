@@ -292,6 +292,7 @@ func _paint_river() -> void:
 		var tile_idx: int = randi() % RIVER_TILE_COUNT
 		sprite.region_rect = Rect2(tile_idx * 16, 0, 16, 16)
 		sprite.centered = true
+		sprite.rotation_degrees = (randi() % 4) * 90.0
 		sprite.position = world_pos
 		_game_map.add_child(sprite)
 
