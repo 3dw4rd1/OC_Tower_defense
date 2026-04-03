@@ -18,6 +18,7 @@ var _in_killbox: bool = false
 var _killbox_timer: float = 0.0
 
 var BASE_TILE: Vector2i = PathfindingManager.BASE_TILE
+var _boss_gold: int = 0
 
 
 func _ready() -> void:
@@ -94,7 +95,11 @@ func reach_base() -> void:
 
 
 func _die() -> void:
-	EconomyManager.award_kill_gold(_enemy_type, GameManager.current_wave)
+	if _enemy_type == "boss":
+		GameManager.add_gold(_boss_gold)
+		print("WaveManager: boss killed — awarded %dg" % _boss_gold)
+	else:
+		EconomyManager.award_kill_gold(_enemy_type, GameManager.current_wave)
 	# rifle_kill_chain: track basic tower kills; fire volley at threshold
 	if _last_hit_tower_type == "basic" and CardManager.has_effect("rifle_kill_chain"):
 		CardManager.kill_chain_counter += 1

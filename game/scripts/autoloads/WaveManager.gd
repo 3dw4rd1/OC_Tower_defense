@@ -36,7 +36,11 @@ const ENEMY_SCENES: Dictionary = {
 	"scout": "res://scenes/enemies/EnemyBasic.tscn",  # same scene, stats overridden at spawn
 	"fast":  "res://scenes/enemies/EnemyFast.tscn",
 	"tank":  "res://scenes/enemies/EnemyTank.tscn",
+	"boss":  "res://scenes/enemies/EnemyTank.tscn",   # boss uses tank scene, stats overridden
 }
+
+# Boss wave gold by tier (waves 5/10/15/20/25)
+const BOSS_GOLD: Array[int] = [50, 75, 100, 125, 150]
 
 var _alive_count: int = 0
 var _total_to_spawn: int = 0
@@ -50,6 +54,10 @@ var _enemies_parent: Node = null
 var _plan_a_wave: bool = false
 var _current_wave_hp: int = 0
 var _current_wave_speed_mult: float = 1.0
+# Boss wave state
+var _current_boss_hp: int = 0
+var _current_boss_speed: float = 0.0
+var _current_boss_gold: int = 0
 
 
 func set_enemies_parent(parent: Node) -> void:
@@ -71,6 +79,9 @@ func start_wave(wave_num: int) -> void:
 	_spawn_timer = 0.0
 	_is_spawning = true
 	_wave_done = false
+	_current_boss_hp = 0
+	_current_boss_speed = 0.0
+	_current_boss_gold = 0
 
 	if wave_num <= 10:
 		_start_plan_a_wave(wave_num)
@@ -114,6 +125,15 @@ func _start_plan_a_wave(wave_num: int) -> void:
 
 	_build_spawn_queue(enemy_list, spawn_interval, use_bursts)
 
+	# Boss on every 5th wave — prepend to queue with 1.5s lead-in gap
+	if wave_num % 5 == 0:
+		var boss_tier: int = (wave_num / 5) - 1  # 0=wave5, 1=wave10, 2=wave15, 3=wave20, 4=wave25
+		_current_boss_hp = PLAN_A_HP[idx] * 8
+		_current_boss_speed = PLAN_A_BASE_SPEED * _current_wave_speed_mult * 0.7
+		_current_boss_gold = BOSS_GOLD[clamp(boss_tier, 0, BOSS_GOLD.size() - 1)]
+		_inject_boss(1.5)
+		print("WaveManager: boss wave %d — HP:%d speed:%.1f gold:%dg" % [wave_num, _current_boss_hp, _current_boss_speed, _current_boss_gold])
+
 
 func _start_legacy_wave(wave_num: int) -> void:
 	var legacy_idx: int = wave_num - 11
@@ -139,6 +159,25 @@ func _start_legacy_wave(wave_num: int) -> void:
 	print("WaveManager: wave %d — %d enemies, spawn interval %.2fs (count_mult=%.2f)" % [wave_num, enemy_list.size(), spawn_interval, count_mult])
 	enemy_list.shuffle()
 	_build_spawn_queue(enemy_list, spawn_interval, false)
+
+	# Boss on every 5th wave — prepend to queue with 1.5s lead-in gap
+	if wave_num % 5 == 0:
+		var boss_tier: int = (wave_num / 5) - 1  # 2=wave15, 3=wave20, 4=wave25
+		var multiplier_steps_boss: int = wave_num - 10
+		var hp_mult: float = pow(1.10, multiplier_steps_boss)
+		_current_boss_hp = int(120 * hp_mult * 8)  # tank baseline × legacy hp_mult × 8
+		var speed_mult_boss: float = pow(1.05, multiplier_steps_boss)
+		_current_boss_speed = 40.0 * speed_mult_boss * 0.7  # tank baseline × legacy speed_mult × 0.7
+		_current_boss_gold = BOSS_GOLD[clamp(boss_tier, 0, BOSS_GOLD.size() - 1)]
+		_inject_boss(1.5)
+		print("WaveManager: boss wave %d — HP:%d speed:%.1f gold:%dg" % [wave_num, _current_boss_hp, _current_boss_speed, _current_boss_gold])
+
+
+# Prepends a boss to the front of an already-built spawn queue.
+# boss_lead_in: gap (seconds) between boss spawn and the first regular enemy.
+func _inject_boss(boss_lead_in: float) -> void:
+	_spawn_queue.push_front("boss")
+	_spawn_delays.push_front(boss_lead_in)
 
 
 # Populates _spawn_queue and _spawn_delays.
@@ -199,7 +238,13 @@ func _do_spawn(enemy_type: String) -> void:
 
 	# Visual differentiation is handled by hue_shift shader baked into each enemy scene
 
-	if _plan_a_wave:
+	if enemy_type == "boss":
+		enemy._hp = _current_boss_hp
+		enemy._max_hp = _current_boss_hp
+		enemy.speed = _current_boss_speed
+		enemy._enemy_type = "boss"
+		enemy._boss_gold = _current_boss_gold
+	elif _plan_a_wave:
 		# Apply Plan A per-wave stats before the node enters the scene tree
 		enemy._hp = _current_wave_hp
 		enemy.speed = PLAN_A_BASE_SPEED * _current_wave_speed_mult
