@@ -118,21 +118,27 @@ func _start_plan_a_wave(wave_num: int) -> void:
 func _start_legacy_wave(wave_num: int) -> void:
 	var legacy_idx: int = wave_num - 11
 	var data: Dictionary = LEGACY_WAVE_DATA[legacy_idx]
+	var multiplier_steps: int = wave_num - 10
+	# Priority 1: count scaling — 8% more enemies per wave above wave 10
+	var count_mult: float = pow(1.08, multiplier_steps)
+	# Priority 2: spawn interval compression — 5% faster per wave, floors ~0.22s by wave 25
+	var spawn_interval: float = 0.5 * pow(0.95, multiplier_steps)
 	# Step 8: horde surge curse — 40% more enemies this wave
 	var horde_active: bool = CardManager.next_wave_horde
 	if horde_active:
 		CardManager.next_wave_horde = false
 	var enemy_list: Array[String] = []
 	for enemy_type: String in data:
-		var count: int = data[enemy_type]
+		var count: int = int(ceil(data[enemy_type] * count_mult))
 		if horde_active:
 			count = int(ceil(count * 1.4))
 		for _i: int in range(count):
 			enemy_list.append(enemy_type)
 	if horde_active:
 		print("WaveManager: horde surge active — spawning %d enemies this wave" % enemy_list.size())
+	print("WaveManager: wave %d — %d enemies, spawn interval %.2fs (count_mult=%.2f)" % [wave_num, enemy_list.size(), spawn_interval, count_mult])
 	enemy_list.shuffle()
-	_build_spawn_queue(enemy_list, 0.5, false)
+	_build_spawn_queue(enemy_list, spawn_interval, false)
 
 
 # Populates _spawn_queue and _spawn_delays.
