@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://zombie_elite001"
-path="res://.godot/imported/elite.png-5bc78f323992ef489ad1632734ffb62c.ctex"
+uid="uid://csh5hvpfglh48"
+path="res://.godot/imported/elite.png-3eb55ec17dcd2917fe56bbcfedcfcc6f.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/sprites/enemies/elite.png"
-dest_files=["res://.godot/imported/elite.png-5bc78f323992ef489ad1632734ffb62c.ctex"]
+dest_files=["res://.godot/imported/elite.png-3eb55ec17dcd2917fe56bbcfedcfcc6f.ctex"]
 
 [params]
 

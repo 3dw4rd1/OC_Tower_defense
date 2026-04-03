@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://zombie_scout001"
-path="res://.godot/imported/scout.png-0c9bd90577dcafb4c8d89ab278c00276.ctex"
+uid="uid://cv6ak7pqampmu"
+path="res://.godot/imported/scout.png-f2381ac80dd3cbc7ee081bf7c95cd6c9.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/sprites/enemies/scout.png"
-dest_files=["res://.godot/imported/scout.png-0c9bd90577dcafb4c8d89ab278c00276.ctex"]
+dest_files=["res://.godot/imported/scout.png-f2381ac80dd3cbc7ee081bf7c95cd6c9.ctex"]
 
 [params]
 

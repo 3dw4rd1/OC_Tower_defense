@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://zombie_brute001"
-path="res://.godot/imported/brute.png-5669be1991f51cb91fc18f1ff30b645f.ctex"
+uid="uid://liiduhs75qmj"
+path="res://.godot/imported/brute.png-51a049308c4942f21d4aa493108aa7a7.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/sprites/enemies/brute.png"
-dest_files=["res://.godot/imported/brute.png-5669be1991f51cb91fc18f1ff30b645f.ctex"]
+dest_files=["res://.godot/imported/brute.png-51a049308c4942f21d4aa493108aa7a7.ctex"]
 
 [params]
 

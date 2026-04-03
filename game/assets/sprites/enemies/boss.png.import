@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://zombie_boss001"
-path="res://.godot/imported/boss.png-b1bfb55a2ac9392b4cbc02b9f4575677.ctex"
+uid="uid://coq0e6yb265qs"
+path="res://.godot/imported/boss.png-a96036838448288cdcf7f3043dfe34c7.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/sprites/enemies/boss.png"
-dest_files=["res://.godot/imported/boss.png-b1bfb55a2ac9392b4cbc02b9f4575677.ctex"]
+dest_files=["res://.godot/imported/boss.png-a96036838448288cdcf7f3043dfe34c7.ctex"]
 
 [params]
 

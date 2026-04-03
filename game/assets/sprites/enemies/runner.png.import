@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://zombie_runner001"
-path="res://.godot/imported/runner.png-67d4fb588e0e14e0e27c1a3bc664e952.ctex"
+uid="uid://c3yunyji86lrk"
+path="res://.godot/imported/runner.png-71caf19dda63e7df614ee1b409034679.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/sprites/enemies/runner.png"
-dest_files=["res://.godot/imported/runner.png-67d4fb588e0e14e0e27c1a3bc664e952.ctex"]
+dest_files=["res://.godot/imported/runner.png-71caf19dda63e7df614ee1b409034679.ctex"]
 
 [params]
 

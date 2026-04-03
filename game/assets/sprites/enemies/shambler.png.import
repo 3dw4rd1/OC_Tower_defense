@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://zombie_shambler001"
-path="res://.godot/imported/shambler.png-354d527052160687f2007addb27808e5.ctex"
+uid="uid://3gyj1lhp1xei"
+path="res://.godot/imported/shambler.png-284144eae0e41b9378fe75eb758fec61.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/sprites/enemies/shambler.png"
-dest_files=["res://.godot/imported/shambler.png-354d527052160687f2007addb27808e5.ctex"]
+dest_files=["res://.godot/imported/shambler.png-284144eae0e41b9378fe75eb758fec61.ctex"]
 
 [params]
 
