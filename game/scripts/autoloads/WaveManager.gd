@@ -177,13 +177,6 @@ func _process(delta: float) -> void:
 			_is_spawning = false
 
 
-const ENEMY_COLORS: Dictionary = {
-	"basic":  Color(0.85, 0.1,  0.1,  1.0),  # red
-	"scout":  Color(0.2,  0.85, 0.2,  1.0),  # bright green — fast and fragile
-	"fast":   Color(0.9,  0.65, 0.0,  1.0),  # orange
-	"tank":   Color(0.4,  0.1,  0.65, 1.0),  # purple
-}
-
 func _do_spawn(enemy_type: String) -> void:
 	_total_spawned += 1
 	if _enemies_parent == null:
@@ -198,10 +191,7 @@ func _do_spawn(enemy_type: String) -> void:
 	var packed: PackedScene = load(scene_path)
 	var enemy: Node2D = packed.instantiate() as Node2D
 
-	# Apply type-specific colour so each enemy is visually distinct
-	var color_rect: ColorRect = enemy.get_node_or_null("ColorRect")
-	if color_rect and ENEMY_COLORS.has(enemy_type):
-		color_rect.color = ENEMY_COLORS[enemy_type]
+	# Visual differentiation is handled by hue_shift shader baked into each enemy scene
 
 	if _plan_a_wave:
 		# Apply Plan A per-wave stats before the node enters the scene tree
