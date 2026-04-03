@@ -25,6 +25,8 @@ func _ready() -> void:
 	PathfindingManager.obstacle_changed.connect(_recalculate_path)
 
 
+
+
 func _physics_process(delta: float) -> void:
 	# Freeze overrides all movement
 	if _is_frozen:

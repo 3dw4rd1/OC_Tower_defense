@@ -6,3 +6,4 @@ func _ready() -> void:
 	_hp = 120
 	_enemy_type = "tank"
 	super._ready()
+	$Sprite2D.material.set_shader_parameter("hue_shift", 240.0)
