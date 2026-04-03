@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy_tank.gd" id="1_tank"]
 [ext_resource type="Texture2D" uid="uid://dtxmqxiili38g" path="res://assets/sprites/enemies/enemy_basic.png" id="2_sprite"]
-[ext_resource type="Shader" path="res://assets/shaders/hue_shift.gdshader" id="3_shader"]
+[ext_resource type="Shader" uid="uid://djfdvfxldc6vy" path="res://assets/shaders/hue_shift.gdshader" id="3_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tank"]
 shader = ExtResource("3_shader")
