@@ -4,7 +4,8 @@ const KILL_GOLD: Dictionary = {
 	"basic": 5,
 	"fast":  8,
 	"tank":  20,
-	"scout": 4,  # Plan A: scouts are quick, low-reward targets
+	"scout": 4,   # Plan A: scouts are quick, low-reward targets
+	"elite": 15,  # faster than basic, tankier than fast — mid-tier reward
 }
 
 # Plan A: wave bonus scales at 15% per wave (income-starved)

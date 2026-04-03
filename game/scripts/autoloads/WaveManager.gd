@@ -37,6 +37,7 @@ const ENEMY_SCENES: Dictionary = {
 	"fast":  "res://scenes/enemies/EnemyFast.tscn",
 	"tank":  "res://scenes/enemies/EnemyTank.tscn",
 	"boss":  "res://scenes/enemies/EnemyTank.tscn",   # boss uses tank scene, stats overridden
+	"elite": "res://scenes/enemies/EnemyElite.tscn",
 }
 
 # Boss wave gold by tier (waves 5/10/15/20/25)
@@ -121,6 +122,13 @@ func _start_plan_a_wave(wave_num: int) -> void:
 	else:
 		for _i: int in range(total_count):
 			enemy_list.append("basic")
+	# Elite injection on wave 10 (~10% of spawns)
+	if wave_num == 10:
+		var elite_count_a: int = int(round(enemy_list.size() * 0.10))
+		for i: int in range(elite_count_a):
+			var replace_idx: int = randi() % enemy_list.size()
+			enemy_list[replace_idx] = "elite"
+
 	enemy_list.shuffle()
 
 	_build_spawn_queue(enemy_list, spawn_interval, use_bursts)
@@ -156,7 +164,14 @@ func _start_legacy_wave(wave_num: int) -> void:
 			enemy_list.append(enemy_type)
 	if horde_active:
 		print("WaveManager: horde surge active — spawning %d enemies this wave" % enemy_list.size())
-	print("WaveManager: wave %d — %d enemies, spawn interval %.2fs (count_mult=%.2f)" % [wave_num, enemy_list.size(), spawn_interval, count_mult])
+	# Elite injection: wave 10+ mixes in elites (10% → 25% by wave 20)
+	var elite_ratio: float = lerpf(0.10, 0.25, float(clamp(wave_num - 10, 0, 10)) / 10.0)
+	var elite_count: int = int(round(enemy_list.size() * elite_ratio))
+	for i: int in range(elite_count):
+		var replace_idx: int = randi() % enemy_list.size()
+		enemy_list[replace_idx] = "elite"
+
+	print("WaveManager: wave %d — %d enemies (%.0f%% elites), spawn interval %.2fs (count_mult=%.2f)" % [wave_num, enemy_list.size(), elite_ratio * 100, spawn_interval, count_mult])
 	enemy_list.shuffle()
 	_build_spawn_queue(enemy_list, spawn_interval, false)
 

@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3 uid="uid://benemy_elite001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_elite.gd" id="1_enemy"]
+[ext_resource type="Texture2D" uid="uid://dtxmqxiili38g" path="res://assets/sprites/enemies/enemy_basic.png" id="2_sprite"]
+[ext_resource type="Shader" uid="uid://djfdvfxldc6vy" path="res://assets/shaders/hue_shift.gdshader" id="3_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_elite"]
+shader = ExtResource("3_shader")
+shader_parameter/hue_shift = 60.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(14, 14)
+
+[node name="EnemyElite" type="CharacterBody2D"]
+script = ExtResource("1_enemy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_elite")
+texture = ExtResource("2_sprite")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
