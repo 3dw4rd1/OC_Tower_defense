@@ -2,8 +2,6 @@ extends TileMap
 
 const GRID_COLS: int = 80
 const GRID_ROWS: int = 41
-# Dark green — placeholder ground tile (grass)
-const GROUND_COLOR: Color = Color(0.18, 0.38, 0.18, 1.0)
 
 const TOWER_SCENES: Dictionary = {
 	"basic":  "res://scenes/towers/TowerBasic.tscn",
@@ -232,23 +230,26 @@ func _show_path_blocked_feedback() -> void:
 	tween.tween_callback(label.queue_free)
 
 
+const GRASS_TILE_COUNT: int = 5
+
 func _build_tileset() -> void:
-	var img: Image = Image.create(16, 16, false, Image.FORMAT_RGBA8)
-	img.fill(GROUND_COLOR)
-	var tex: ImageTexture = ImageTexture.create_from_image(img)
+	var tex: Texture2D = load("res://assets/sprites/terrain/grasstiles.png")
 
 	var source: TileSetAtlasSource = TileSetAtlasSource.new()
 	source.texture = tex
 	source.texture_region_size = Vector2i(16, 16)
-	source.create_tile(Vector2i(0, 0))
+	# Register all 5 tiles from the horizontal strip
+	for i: int in range(GRASS_TILE_COUNT):
+		source.create_tile(Vector2i(i, 0))
 
 	var tileset: TileSet = TileSet.new()
 	tileset.tile_size = Vector2i(16, 16)
-	tileset.add_source(source)  # source_id 0 — ground
+	tileset.add_source(source)  # source_id 0 — grass tiles
 	tile_set = tileset
 
 
 func _fill_ground() -> void:
 	for y: int in range(GRID_ROWS):
 		for x: int in range(GRID_COLS):
-			set_cell(0, Vector2i(x, y), 0, Vector2i(0, 0))
+			var tile_idx: int = randi() % GRASS_TILE_COUNT
+			set_cell(0, Vector2i(x, y), 0, Vector2i(tile_idx, 0))
