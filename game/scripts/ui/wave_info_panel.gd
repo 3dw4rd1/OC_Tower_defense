@@ -1,17 +1,23 @@
 extends CanvasLayer
 
 const ENEMY_DISPLAY_NAMES: Dictionary = {
-	"basic": "Shambler",
-	"scout": "Scout",
-	"fast":  "Runner",
-	"tank":  "Brute",
-	"boss":  "BOSS",
-	"elite": "Elite",
+	"basic":   "Shambler",
+	"scout":   "Scout",
+	"fast":    "Runner",
+	"tank":    "Brute",
+	"boss":    "BOSS",
+	"elite":   "Elite",
+	"armored": "Armored",
+}
+
+# Armor values shown in the AR column (0.0 = no armor)
+const ARMOR_VALUES: Dictionary = {
+	"armored": 0.35,
 }
 
 # Base enemy HP and speed (from scene defaults, used for legacy wave scaling)
-const BASE_HP: Dictionary    = {"basic": 30,   "fast": 15,    "tank": 120, "elite": 80}
-const BASE_SPEED: Dictionary = {"basic": 80.0, "fast": 144.0, "tank": 40.0, "elite": 96.0}
+const BASE_HP: Dictionary    = {"basic": 30,   "fast": 15,    "tank": 120, "elite": 80,   "armored": 60}
+const BASE_SPEED: Dictionary = {"basic": 80.0, "fast": 144.0, "tank": 40.0, "elite": 96.0, "armored": 60.0}
 
 var _panel: Panel
 var _rows_container: VBoxContainer
@@ -121,16 +127,19 @@ func refresh_wave_data(wave_num: int) -> void:
 		_add_label("Alive: %d" % alive, Color(1.0, 0.50, 0.50, 1.0))
 
 	_add_separator()
-	_add_row("Type", "Count", "HP", "Speed", true)
+	_add_row("Type", "Count", "HP", "Speed", "AR", true)
 	_add_separator()
 
 	var groups := _compute_wave_groups(wave_num)
 	for g: Dictionary in groups:
+		var armor_val: float = ARMOR_VALUES.get(g["type"], 0.0)
+		var armor_str: String = "%d%%" % int(armor_val * 100) if armor_val > 0.0 else "-"
 		_add_row(
 			ENEMY_DISPLAY_NAMES.get(g["type"], g["type"]),
 			str(g["count"]),
 			str(g["hp"]),
-			"%.0f" % g["speed"]
+			"%.0f" % g["speed"],
+			armor_str
 		)
 
 
@@ -197,6 +206,15 @@ func _compute_wave_groups(wave_num: int) -> Array:
 				"hp": int(BASE_HP["elite"] * hp_mult),
 				"speed": BASE_SPEED["elite"] * spd_mult})
 
+		# Armored injection: wave 13+ (5% → 15% by wave 25)
+		if wave_num >= 13:
+			var armored_ratio: float = lerpf(0.05, 0.15, float(clamp(wave_num - 13, 0, 12)) / 12.0)
+			var armored_count: int   = int(round(total_legacy * armored_ratio))
+			if armored_count > 0:
+				groups.append({"type": "armored", "count": armored_count,
+					"hp": int(BASE_HP["armored"] * hp_mult),
+					"speed": BASE_SPEED["armored"] * spd_mult})
+
 		groups.append_array(temp)
 
 	else:
@@ -206,9 +224,10 @@ func _compute_wave_groups(wave_num: int) -> Array:
 		var espd: float      = pow(1.07, step)
 		var ecnt: float      = pow(1.12, step)
 		var total: int       = int(ceil(75 * ecnt))
-		var e_ratio: float   = min(0.35, 0.25 + step * 0.01)
-		var t_ratio: float   = 0.20
-		var f_ratio: float   = 0.25
+		var e_ratio: float   = min(0.30, 0.25 + step * 0.01)
+		var a_ratio: float   = min(0.15, 0.10 + step * 0.005)
+		var t_ratio: float   = 0.18
+		var f_ratio: float   = 0.22
 
 		if wave_num % 5 == 0:
 			var ms: int = wave_num - 10
@@ -216,22 +235,26 @@ func _compute_wave_groups(wave_num: int) -> Array:
 				"hp": int(120 * pow(1.10, ms) * 8 * ehp),
 				"speed": 40.0 * pow(1.05, ms) * 0.7 * espd})
 
-		var elite_n: int = int(round(total * e_ratio))
-		var tank_n: int  = int(round(total * t_ratio))
-		var fast_n: int  = int(round(total * f_ratio))
-		var basic_n: int = total - elite_n - tank_n - fast_n
+		var elite_n:   int = int(round(total * e_ratio))
+		var armored_n: int = int(round(total * a_ratio))
+		var tank_n:    int = int(round(total * t_ratio))
+		var fast_n:    int = int(round(total * f_ratio))
+		var basic_n:   int = total - elite_n - armored_n - tank_n - fast_n
 
 		if elite_n > 0:
-			groups.append({"type": "elite", "count": elite_n,
+			groups.append({"type": "elite",   "count": elite_n,
 				"hp": int(400 * ehp), "speed": 96.0  * 2.1 * espd})
+		if armored_n > 0:
+			groups.append({"type": "armored", "count": armored_n,
+				"hp": int(200 * ehp), "speed": 60.0  * 2.1 * espd})
 		if tank_n > 0:
-			groups.append({"type": "tank",  "count": tank_n,
+			groups.append({"type": "tank",    "count": tank_n,
 				"hp": int(600 * ehp), "speed": 40.0  * 2.1 * espd})
 		if fast_n > 0:
-			groups.append({"type": "fast",  "count": fast_n,
+			groups.append({"type": "fast",    "count": fast_n,
 				"hp": int(150 * ehp), "speed": 144.0 * 2.1 * espd})
 		if basic_n > 0:
-			groups.append({"type": "basic", "count": basic_n,
+			groups.append({"type": "basic",   "count": basic_n,
 				"hp": int(300 * ehp), "speed": 80.0  * 2.1 * espd})
 
 	return groups
@@ -249,12 +272,12 @@ func _add_separator() -> void:
 	_rows_container.add_child(HSeparator.new())
 
 
-func _add_row(col_type: String, col_count: String, col_hp: String, col_speed: String, is_header: bool = false) -> void:
+func _add_row(col_type: String, col_count: String, col_hp: String, col_speed: String, col_armor: String = "-", is_header: bool = false) -> void:
 	var hbox := HBoxContainer.new()
 	hbox.size_flags_horizontal = Control.SIZE_FILL
 
-	var cols   := [col_type, col_count, col_hp, col_speed]
-	var widths := [95,       45,        65,      60]
+	var cols   := [col_type, col_count, col_hp, col_speed, col_armor]
+	var widths := [85,       42,        55,      50,        35]
 	var color  := Color(1.0, 0.85, 0.30, 1.0) if is_header else Color(1, 1, 1, 1)
 
 	for i: int in range(cols.size()):
@@ -263,6 +286,9 @@ func _add_row(col_type: String, col_count: String, col_hp: String, col_speed: St
 		lbl.custom_minimum_size.x = float(widths[i])
 		lbl.add_theme_color_override("font_color", color)
 		lbl.add_theme_font_size_override("font_size", 11)
+		# Highlight armor column for armored enemy rows
+		if i == 4 and col_armor != "-" and col_armor != "AR":
+			lbl.add_theme_color_override("font_color", Color(0.50, 0.85, 1.0, 1.0))
 		hbox.add_child(lbl)
 
 	_rows_container.add_child(hbox)
