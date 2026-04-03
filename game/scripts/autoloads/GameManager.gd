@@ -22,6 +22,7 @@ var state: GameState = GameState.SETUP
 var current_wave: int = 0
 var base_hp: int = MAX_BASE_HP
 var gold: int = 1000
+var endless_mode: bool = false
 
 
 func _ready() -> void:
@@ -64,9 +65,11 @@ func start_next_wave() -> void:
 
 func end_wave() -> void:
 	EconomyManager.award_wave_bonus(current_wave)
-	if current_wave >= TOTAL_WAVES:
-		_set_state(GameState.VICTORY)
-		victory.emit()
+	if current_wave == TOTAL_WAVES and not endless_mode:
+		endless_mode = true
+		print("GameManager: wave 25 cleared — ENDLESS MODE begins!")
+		_set_state(GameState.CARD_DRAFT)
+		CardManager.start_draft()
 	else:
 		_set_state(GameState.CARD_DRAFT)
 		CardManager.start_draft()

@@ -59,6 +59,10 @@ var _current_wave_speed_mult: float = 1.0
 var _current_boss_hp: int = 0
 var _current_boss_speed: float = 0.0
 var _current_boss_gold: int = 0
+# Endless mode state
+var _is_endless_wave: bool = false
+var _endless_hp_mult: float = 1.0
+var _endless_speed_mult: float = 1.0
 
 
 func set_enemies_parent(parent: Node) -> void:
@@ -70,7 +74,7 @@ func get_alive_count() -> int:
 
 
 func start_wave(wave_num: int) -> void:
-	if wave_num < 1 or wave_num > GameManager.TOTAL_WAVES:
+	if wave_num < 1:
 		return
 
 	_spawn_queue.clear()
@@ -83,12 +87,18 @@ func start_wave(wave_num: int) -> void:
 	_current_boss_hp = 0
 	_current_boss_speed = 0.0
 	_current_boss_gold = 0
+	_is_endless_wave = false
+	_endless_hp_mult = 1.0
+	_endless_speed_mult = 1.0
 
 	if wave_num <= 10:
 		_start_plan_a_wave(wave_num)
-	else:
+	elif wave_num <= 25:
 		_plan_a_wave = false
 		_start_legacy_wave(wave_num)
+	else:
+		_plan_a_wave = false
+		_start_endless_wave(wave_num)
 
 	_total_to_spawn = _spawn_queue.size()
 	wave_started.emit(wave_num)
@@ -188,6 +198,56 @@ func _start_legacy_wave(wave_num: int) -> void:
 		print("WaveManager: boss wave %d — HP:%d speed:%.1f gold:%dg" % [wave_num, _current_boss_hp, _current_boss_speed, _current_boss_gold])
 
 
+func _start_endless_wave(wave_num: int) -> void:
+	var endless_step: int = wave_num - 25
+	_endless_hp_mult = pow(1.18, endless_step)
+	_endless_speed_mult = pow(1.07, endless_step)
+	var count_mult: float = pow(1.12, endless_step)
+	_is_endless_wave = true
+
+	var base_count: int = 75  # wave 25 baseline
+	var total_count: int = int(ceil(base_count * count_mult))
+	var spawn_interval: float = max(0.15, 0.22 * pow(0.97, endless_step))
+
+	# Mix: basic / fast / tank / elite, elite ratio grows over time
+	var elite_ratio: float  = min(0.35, 0.25 + endless_step * 0.01)
+	var tank_ratio: float   = 0.20
+	var fast_ratio: float   = 0.25
+	var enemy_list: Array[String] = []
+	for _i: int in range(total_count):
+		var roll: float = randf()
+		if roll < elite_ratio:
+			enemy_list.append("elite")
+		elif roll < elite_ratio + tank_ratio:
+			enemy_list.append("tank")
+		elif roll < elite_ratio + tank_ratio + fast_ratio:
+			enemy_list.append("fast")
+		else:
+			enemy_list.append("basic")
+
+	# Horde surge curse
+	if CardManager.next_wave_horde:
+		CardManager.next_wave_horde = false
+		var extra: int = int(ceil(total_count * 0.4))
+		for _i: int in range(extra):
+			enemy_list.append(enemy_list[randi() % enemy_list.size()])
+		print("WaveManager: horde surge active — endless wave now %d enemies" % enemy_list.size())
+
+	print("WaveManager: endless wave %d (step %d) — %d enemies, hp_mult=%.2f, speed_mult=%.2f, interval=%.2fs" % [wave_num, endless_step, enemy_list.size(), _endless_hp_mult, _endless_speed_mult, spawn_interval])
+	enemy_list.shuffle()
+	_build_spawn_queue(enemy_list, spawn_interval, endless_step >= 3)
+
+	# Boss every 5th wave continues in endless
+	if wave_num % 5 == 0:
+		var boss_tier: int = clamp((wave_num / 5) - 1, 0, BOSS_GOLD.size() - 1)
+		var ms: int = wave_num - 10
+		_current_boss_hp = int(120 * pow(1.10, ms) * 8 * _endless_hp_mult)
+		_current_boss_speed = 40.0 * pow(1.05, ms) * 0.7 * _endless_speed_mult
+		_current_boss_gold = BOSS_GOLD[boss_tier] + (endless_step * 25)  # gold keeps scaling
+		_inject_boss(1.5)
+		print("WaveManager: endless boss wave %d — HP:%d speed:%.1f gold:%dg" % [wave_num, _current_boss_hp, _current_boss_speed, _current_boss_gold])
+
+
 # Prepends a boss to the front of an already-built spawn queue.
 # boss_lead_in: gap (seconds) between boss spawn and the first regular enemy.
 func _inject_boss(boss_lead_in: float) -> void:
@@ -268,6 +328,24 @@ func _do_spawn(enemy_type: String) -> void:
 			enemy._hp = int(_current_wave_hp * 0.4)
 			enemy.speed = PLAN_A_BASE_SPEED * _current_wave_speed_mult * 2.0
 			enemy._enemy_type = "scout"
+	elif _is_endless_wave:
+		# Endless waves: scale from wave-25 baselines
+		var base_hp: int
+		var base_speed: float
+		match enemy_type:
+			"basic":
+				base_hp = 300; base_speed = 80.0 * 2.1
+			"fast":
+				base_hp = 150; base_speed = 144.0 * 2.1
+			"tank":
+				base_hp = 600; base_speed = 40.0 * 2.1
+			"elite":
+				base_hp = 400; base_speed = 96.0 * 2.1
+			_:
+				base_hp = 300; base_speed = 80.0 * 2.1
+		enemy._hp = int(base_hp * _endless_hp_mult)
+		enemy._max_hp = enemy._hp
+		enemy.speed = base_speed * _endless_speed_mult
 	else:
 		# Legacy waves 11-25: compound scaling from wave 10 baseline
 		if GameManager.current_wave > 10:
@@ -298,8 +376,6 @@ func _check_wave_complete() -> void:
 		_wave_done = true
 		var wave_num: int = GameManager.current_wave
 		wave_completed.emit(wave_num)
-		if wave_num >= GameManager.TOTAL_WAVES:
-			all_waves_complete.emit()
 		GameManager.end_wave()
 
 
