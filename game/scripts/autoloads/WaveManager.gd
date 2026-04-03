@@ -33,10 +33,10 @@ const LEGACY_WAVE_DATA: Array = [
 
 const ENEMY_SCENES: Dictionary = {
 	"basic":    "res://scenes/enemies/EnemyBasic.tscn",
-	"scout":    "res://scenes/enemies/EnemyBasic.tscn",  # same scene, stats overridden at spawn
+	"scout":    "res://scenes/enemies/EnemyScout.tscn",
 	"fast":     "res://scenes/enemies/EnemyFast.tscn",
 	"tank":     "res://scenes/enemies/EnemyTank.tscn",
-	"boss":     "res://scenes/enemies/EnemyTank.tscn",   # boss uses tank scene, stats overridden
+	"boss":     "res://scenes/enemies/EnemyBoss.tscn",
 	"elite":    "res://scenes/enemies/EnemyElite.tscn",
 	"armored":  "res://scenes/enemies/EnemyArmored.tscn",
 }
@@ -322,8 +322,6 @@ func _do_spawn(enemy_type: String) -> void:
 		return
 	var packed: PackedScene = load(scene_path)
 	var enemy: Node2D = packed.instantiate() as Node2D
-
-	# Visual differentiation is handled by hue_shift shader baked into each enemy scene
 
 	if enemy_type == "boss":
 		enemy._hp = _current_boss_hp

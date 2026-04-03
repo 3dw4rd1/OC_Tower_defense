@@ -13,7 +13,6 @@ func _ready() -> void:
 	_max_hp = 60
 	_enemy_type = "armored"
 	super._ready()
-	$Sprite2D.material.set_shader_parameter("hue_shift", 200.0)  # steel-blue tint
 
 
 func take_damage(amount: int) -> void:

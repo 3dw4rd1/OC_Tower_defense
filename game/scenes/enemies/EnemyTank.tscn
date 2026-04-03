@@ -1,12 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://benemytank001"]
+[gd_scene load_steps=3 format=3 uid="uid://benemytank001"]
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy_tank.gd" id="1_tank"]
-[ext_resource type="Texture2D" uid="uid://dtxmqxiili38g" path="res://assets/sprites/enemies/enemy_basic.png" id="2_sprite"]
-[ext_resource type="Shader" uid="uid://djfdvfxldc6vy" path="res://assets/shaders/hue_shift.gdshader" id="3_shader"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tank"]
-shader = ExtResource("3_shader")
-shader_parameter/hue_shift = 240.0
+[ext_resource type="Texture2D" uid="uid://zombie_brute001" path="res://assets/sprites/enemies/brute.png" id="2_sprite"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(14, 14)
@@ -15,7 +10,6 @@ size = Vector2(14, 14)
 script = ExtResource("1_tank")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-material = SubResource("ShaderMaterial_tank")
 texture = ExtResource("2_sprite")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

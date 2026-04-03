@@ -6,4 +6,3 @@ func _ready() -> void:
 	_hp = 15
 	_enemy_type = "fast"
 	super._ready()
-	$Sprite2D.material.set_shader_parameter("hue_shift", 120.0)
