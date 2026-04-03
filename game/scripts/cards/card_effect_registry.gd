@@ -55,7 +55,7 @@ func apply(effect: String, params: Dictionary, card_manager: Node) -> void:
 			print("  → [card effect] kill_gold_flat +%dg per kill (total card bonus: %dg)" % [amount, EconomyManager.card_kill_bonus])
 
 		"tower_cost_reduction":
-			var amount: float = params.get("amount", 0.0)
+			var amount: float = params.get("reduction", params.get("amount", 0.0))
 			card_manager.card_cost_multiplier *= (1.0 - amount)
 			print("  → [card effect] tower_cost_reduction %.0f%% off — cost multiplier now %.2f" % [amount * 100, card_manager.card_cost_multiplier])
 
