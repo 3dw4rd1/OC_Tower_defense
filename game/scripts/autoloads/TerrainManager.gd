@@ -228,25 +228,14 @@ func _generate_river() -> void:
 	var start_y: int = randi_range(8, GRID_ROWS - 9)
 	var pos := Vector2i(start_x, start_y)
 	var target: Vector2i = BASE_TILE
-	var width_timer: int = 0
 	var max_iter: int = 5000
 	var iter: int = 0
 
 	while pos != target and iter < max_iter:
 		iter += 1
 		river_tiles[pos] = true
-		# Width logic
-		if width_timer == 0:
-			if randf() < 0.20:
-				width_timer = randi_range(2, 4)
-		if width_timer > 0:
-			var above := Vector2i(pos.x, clampi(pos.y - 1, 0, GRID_ROWS - 1))
-			var below := Vector2i(pos.x, clampi(pos.y + 1, 0, GRID_ROWS - 1))
-			river_tiles[above] = true
-			river_tiles[below] = true
-			width_timer -= 1
 
-		# Drunkard's walk biased toward base
+		# Biased walk toward base
 		var roll: float = randf()
 		var dx: int = target.x - pos.x
 		var dy: int = target.y - pos.y
